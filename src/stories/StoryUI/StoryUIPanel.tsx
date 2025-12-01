@@ -284,14 +284,6 @@ const isEdgeMode = () => {
          baseUrl.startsWith('https://') && !baseUrl.includes('localhost');
 };
 
-// Helper to check if we're in dev mode (local or Railway with Storybook dev server)
-// Dev mode uses HMR which needs time to load newly generated story modules
-const isDevMode = () => {
-  // In dev mode, stories are written to filesystem and loaded via HMR
-  // Edge mode uses static builds so this isn't needed
-  return !isEdgeMode();
-};
-
 // Helper to convert story title to Storybook URL format
 // e.g., "Simple Card With Image" -> "generated-simple-card-with-image--default"
 const titleToStoryPath = (title: string): string => {
@@ -299,19 +291,20 @@ const titleToStoryPath = (title: string): string => {
   return `generated-${kebabTitle}--default`;
 };
 
-// Helper to navigate to a newly created story after HMR has time to process
-// This prevents the "Couldn't find story after HMR" error by doing a full page reload
-const navigateToNewStory = (title: string, delayMs: number = 3000) => {
-  if (!isDevMode()) return; // Only needed in dev mode with HMR
-
+// Helper to navigate to a newly created story after generation completes
+// In dev mode with HMR, this prevents the "Couldn't find story after HMR" error
+// In all modes, this provides a better UX by auto-navigating to the new story
+const navigateToNewStory = (title: string, delayMs: number = 4000) => {
   const storyPath = titleToStoryPath(title);
   console.log(`[Story UI] Will navigate to story "${storyPath}" in ${delayMs}ms...`);
 
   setTimeout(() => {
-    // Do a full page navigation to ensure the story module is loaded fresh
-    const newUrl = `${window.location.origin}${window.location.pathname}?path=/story/${storyPath}`;
-    console.log(`[Story UI] Navigating to: ${newUrl}`);
-    window.location.href = newUrl;
+    // Navigate the TOP window (parent Storybook UI), not the iframe
+    // The Story UI panel runs inside an iframe, so we need window.top to escape it
+    const topWindow = window.top || window;
+    const newUrl = `${topWindow.location.origin}/?path=/story/${storyPath}`;
+    console.log(`[Story UI] Navigating parent window to: ${newUrl}`);
+    topWindow.location.href = newUrl;
   }, delayMs);
 };
 
@@ -1856,15 +1849,13 @@ function StoryUIPanel() {
       }
     }
 
-    // Show refresh hint only once per session for new stories
-    // In Edge mode, stories are stored in Durable Objects
-    // In dev mode, we auto-navigate after HMR processes
+    // Show refresh hint only once per session for new stories (local mode only)
+    // In Edge mode, stories are stored in Durable Objects, not on filesystem
     if (!isUpdate && !hasShownRefreshHint.current) {
       if (isEdgeMode()) {
         parts.push(`\n\n_Story saved to cloud. View code in chat history above._`);
       } else {
-        // Dev mode - we'll auto-navigate to the story
-        parts.push(`\n\n⏳ _Loading your story in a moment..._`);
+        parts.push(`\n\n_Refresh Storybook (Cmd/Ctrl + R) to see new stories in the sidebar._`);
       }
       hasShownRefreshHint.current = true;
     }
@@ -1891,11 +1882,6 @@ function StoryUIPanel() {
     const aiMsg: Message = { role: 'ai', content: responseMessage };
     const updatedConversation = [...newConversation, aiMsg];
     setConversation(updatedConversation);
-
-    // Auto-navigate to the new story (only in dev mode, only for new stories)
-    if (!isUpdate && completion.title) {
-      navigateToNewStory(completion.title);
-    }
 
     // Update chat session
     const isExistingSession = activeChatId && conversation.length > 0;
@@ -1937,6 +1923,11 @@ function StoryUIPanel() {
       }
       saveChats(chats);
       setRecentChats(chats);
+
+      // Auto-navigate to the newly created story after HMR processes the file
+      // This prevents the "Couldn't find story after HMR" error by refreshing
+      // after the file system has been updated and HMR has processed the change
+      navigateToNewStory(chatTitle);
     }
   }, [activeChatId, activeTitle, conversation.length]);
 
@@ -2105,12 +2096,7 @@ function StoryUIPanel() {
           if (data.isUpdate) {
             responseMessage = `${statusIcon} **Updated: "${data.title}"**\n\nI've made the requested changes to your component. You can view the updated version in Storybook.\n\n_Check the Docs tab to see both the rendered component and its code._`;
           } else {
-            // In dev mode, we'll auto-navigate after HMR processes the file
-            const autoNavMsg = isDevMode() ? '\n\n⏳ _Loading your story in a moment..._' : '\n\n💡 **Note**: If you don\'t see the story immediately, you may need to refresh your Storybook page (Cmd/Ctrl + R).';
-            responseMessage = `${statusIcon} **Created: "${data.title}"**\n\nI've generated the component with the requested features.${autoNavMsg}`;
-
-            // Auto-navigate to the new story (only in dev mode)
-            navigateToNewStory(data.title);
+            responseMessage = `${statusIcon} **Created: "${data.title}"**\n\nI've generated the component with the requested features. You can view it in Storybook where you'll see both the rendered component and its markup.\n\n💡 **Note**: If you don't see the story immediately, you may need to refresh your Storybook page (Cmd/Ctrl + R).`;
           }
 
           const aiMsg: Message = { role: 'ai', content: responseMessage };
@@ -2134,11 +2120,12 @@ function StoryUIPanel() {
             setRecentChats(chats);
           } else {
             const chatId = data.storyId || data.fileName || Date.now().toString();
+            const chatTitle = data.title || userInput;
             setActiveChatId(chatId);
-            setActiveTitle(data.title || userInput);
+            setActiveTitle(chatTitle);
             const newSession: ChatSession = {
               id: chatId,
-              title: data.title || userInput,
+              title: chatTitle,
               fileName: data.fileName || '',
               conversation: updatedConversation,
               lastUpdated: Date.now(),
@@ -2148,6 +2135,9 @@ function StoryUIPanel() {
             if (chats.length > MAX_RECENT_CHATS) chats.splice(MAX_RECENT_CHATS);
             saveChats(chats);
             setRecentChats(chats);
+
+            // Auto-navigate to the newly created story
+            navigateToNewStory(chatTitle);
           }
         } catch (fallbackErr: unknown) {
           const errorMessage = fallbackErr instanceof Error ? fallbackErr.message : 'Unknown error';
@@ -2172,12 +2162,7 @@ function StoryUIPanel() {
         if (data.isUpdate) {
           responseMessage = `${statusIcon} **Updated: "${data.title}"**\n\nI've made the requested changes to your component. You can view the updated version in Storybook.\n\n_Check the Docs tab to see both the rendered component and its code._`;
         } else {
-          // In dev mode, we'll auto-navigate after HMR processes the file
-          const autoNavMsg = isDevMode() ? '\n\n⏳ _Loading your story in a moment..._' : '\n\n💡 **Note**: If you don\'t see the story immediately, you may need to refresh your Storybook page (Cmd/Ctrl + R).';
-          responseMessage = `${statusIcon} **Created: "${data.title}"**\n\nI've generated the component with the requested features.${autoNavMsg}`;
-
-          // Auto-navigate to the new story (only in dev mode)
-          navigateToNewStory(data.title);
+          responseMessage = `${statusIcon} **Created: "${data.title}"**\n\nI've generated the component with the requested features. You can view it in Storybook where you'll see both the rendered component and its markup.\n\n💡 **Note**: If you don't see the story immediately, you may need to refresh your Storybook page (Cmd/Ctrl + R).`;
         }
 
         const aiMsg: Message = { role: 'ai', content: responseMessage };
