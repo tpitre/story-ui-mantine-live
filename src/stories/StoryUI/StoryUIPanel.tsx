@@ -321,6 +321,23 @@ const storeGeneratedCode = (title: string, code: string) => {
   }
   topWindow.__STORY_UI_GENERATED_CODE__[storyPath] = code;
   console.log(`[Story UI] Stored code for story "${storyPath}" in window cache`);
+
+  // ALSO store to localStorage so it persists across page navigation/reload
+  // The window cache gets cleared on navigation, but localStorage persists
+  try {
+    const stored = JSON.parse(localStorage.getItem('storyui_generated_code') || '{}');
+
+    // Store under multiple keys so manager.tsx can find it using its key-matching logic
+    // Key formats that manager.tsx tries: storyPath, componentNameLower, pascalCase, title, etc.
+    stored[storyPath] = code;
+    stored[title] = code;
+    stored[title.replace(/\s+/g, '')] = code; // No spaces version
+
+    localStorage.setItem('storyui_generated_code', JSON.stringify(stored));
+    console.log(`[Story UI] Stored code for story "${storyPath}" in localStorage (keys: ${storyPath}, ${title})`);
+  } catch (e) {
+    console.warn('[Story UI] Failed to store code in localStorage:', e);
+  }
 };
 
 // Helper to navigate to a newly created story after generation completes
