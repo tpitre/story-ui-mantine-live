@@ -138,6 +138,7 @@ interface AttachedImage {
   file: File;
   preview: string;
   base64?: string;
+  mediaType?: string; // Store MIME type for data URL reconstruction after localStorage restore
 }
 
 // Provider info from /story-ui/providers API
@@ -249,10 +250,11 @@ interface ChatSession {
 // Priority order:
 // 1. VITE_STORY_UI_EDGE_URL - Edge Worker URL for cloud deployments
 // 2. window.__STORY_UI_EDGE_URL__ - Runtime override for edge URL
-// 3. VITE_STORY_UI_PORT - Custom port for localhost
-// 4. window.__STORY_UI_PORT__ - Legacy port override
-// 5. window.STORY_UI_MCP_PORT - MCP port override
-// 6. Default to localhost:4001
+// 3. Production domains (railway.app, render.com, pages.dev) - use same origin
+// 4. VITE_STORY_UI_PORT - Custom port for localhost
+// 5. window.__STORY_UI_PORT__ - Legacy port override
+// 6. window.STORY_UI_MCP_PORT - MCP port override
+// 7. Default to localhost:4001
 const getApiBaseUrl = () => {
   // Check for Edge Worker URL (cloud deployment)
   const edgeUrl = (import.meta as any).env?.VITE_STORY_UI_EDGE_URL;
@@ -261,6 +263,16 @@ const getApiBaseUrl = () => {
   // Check for window override for edge URL (support both naming conventions)
   const windowEdgeUrl = (window as any).__STORY_UI_EDGE_URL__ || (window as any).STORY_UI_EDGE_URL;
   if (windowEdgeUrl) return windowEdgeUrl.replace(/\/$/, '');
+
+  // Check if we're running on Railway production domain
+  // In this case, the MCP server is proxied through the same origin
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname.includes('.railway.app')) {
+      // Use same-origin requests (empty string means relative URLs)
+      return '';
+    }
+  }
 
   // Check for Vite port environment variable
   const vitePort = (import.meta as any).env?.VITE_STORY_UI_PORT;
@@ -1533,6 +1545,7 @@ function StoryUIPanel() {
           file,
           preview,
           base64,
+          mediaType: file.type || 'image/png',
         });
       } catch (err) {
         errors.push(`${file.name}: Failed to process`);
@@ -1627,6 +1640,7 @@ function StoryUIPanel() {
           file,
           preview,
           base64,
+          mediaType: file.type || 'image/png',
         });
       } catch (err) {
         errors.push(`${file.name}: Failed to process`);
@@ -1692,6 +1706,7 @@ function StoryUIPanel() {
           file: renamedFile,
           preview,
           base64,
+          mediaType: file.type || 'image/png',
         });
       } catch (err) {
         errors.push('Failed to process pasted image');
@@ -2537,7 +2552,9 @@ function StoryUIPanel() {
                     {msg.attachedImages.map((img) => (
                       <img
                         key={img.id}
-                        src={img.preview}
+                        src={img.base64
+                          ? `data:${img.mediaType || 'image/png'};base64,${img.base64}`
+                          : img.preview}
                         alt="attached"
                         style={STYLES.userMessageImage}
                       />
