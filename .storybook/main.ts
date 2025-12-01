@@ -108,6 +108,24 @@ const config: StorybookConfig = {
       ),
     };
 
+    // Configure HMR for Railway's reverse proxy setup
+    // Railway handles TLS termination and proxies to internal services
+    // We need the HMR WebSocket client to connect through Railway's proxy (port 443)
+    // instead of directly to Storybook's internal port (6006)
+    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      config.server = {
+        ...config.server,
+        hmr: {
+          // Tell HMR client to connect to port 443 (Railway's external HTTPS port)
+          clientPort: 443,
+          // Use secure WebSocket since Railway terminates TLS
+          protocol: 'wss',
+          // NOTE: Do NOT set 'host' here - that makes the server bind to that IP
+          // which causes EADDRNOTAVAIL errors in containerized environments
+        },
+      };
+    }
+
     return config;
   }
 };
