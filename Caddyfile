@@ -10,16 +10,40 @@ http://:{$PORT:80} {
     # Route /story-ui API requests to the Story UI MCP server
     # The StoryUIPanel makes requests to /story-ui/providers, /story-ui/generate, etc.
     handle /story-ui/* {
-        reverse_proxy 127.0.0.1:4005
+        reverse_proxy 127.0.0.1:4005 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
     }
 
     # Also route /mcp requests to the Story UI MCP server (legacy support)
     handle /mcp* {
-        reverse_proxy 127.0.0.1:4005
+        reverse_proxy 127.0.0.1:4005 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
     }
 
     # Everything else goes to Storybook dev server
+    # This includes HMR WebSocket connections that need special handling
     handle {
-        reverse_proxy 127.0.0.1:6006
+        reverse_proxy 127.0.0.1:6006 {
+            # Preserve headers for proper routing
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+
+            # Increase timeouts for long-lived WebSocket connections (HMR)
+            # Railway may close idle connections, so we set generous timeouts
+            transport http {
+                read_timeout 3600s
+                write_timeout 3600s
+            }
+        }
     }
 }

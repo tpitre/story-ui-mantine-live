@@ -1,6 +1,6 @@
 # Story UI Live Deployment
 # Runs Storybook DEV MODE (required for hot reload story generation) with MCP server behind Caddy
-# Build timestamp: 2025-12-01T04:20:00Z - fix: simpler port-only health check, dev mode
+# Build timestamp: 2025-12-01T04:45:00Z - fix: Caddyfile port syntax (:{$PORT:80} not {$PORT:80})
 
 FROM node:20-slim
 

@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: story-ui-mantine-live
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    envVars:
-      - key: PORT
-        value: 6006
-    healthCheckPath: /

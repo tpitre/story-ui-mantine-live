@@ -253,6 +253,12 @@ const GeneratedStoriesPanel: React.FC<{ active?: boolean }> = ({ active }) => {
 
 // Register the addon
 addons.register(ADDON_ID, () => {
+  // Only register the Generated panel in Edge mode (production deployments)
+  // In local development, this panel has no functionality
+  if (!isEdgeMode()) {
+    return;
+  }
+
   // Register the sidebar panel
   addons.add(PANEL_ID, {
     type: types.PANEL,
