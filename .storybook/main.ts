@@ -89,6 +89,23 @@ const config: StorybookConfig = {
       dedupe: ['react', 'react-dom'],
     };
 
+    // Configure HMR for Railway/proxy environments
+    // When behind a reverse proxy (Caddy), Vite needs to know to connect through the proxy
+    // not directly to the internal Storybook port (6006)
+    if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+      config.server = {
+        ...config.server,
+        hmr: {
+          // Use the Railway public domain
+          host: process.env.RAILWAY_PUBLIC_DOMAIN,
+          // External port is always 443 for Railway HTTPS (TLS termination)
+          clientPort: 443,
+          // Use secure WebSocket since Railway uses HTTPS
+          protocol: 'wss',
+        },
+      };
+    }
+
     // Pass environment variables to the client
     // Edge URL must be configured via environment variable (VITE_STORY_UI_EDGE_URL)
     // For Cloudflare Pages: Set in dashboard under Settings > Environment Variables
