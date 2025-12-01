@@ -1,210 +1,322 @@
 /**
  * Story UI Storybook Manager Addon
  *
- * This addon integrates with Storybook's sidebar to show generated stories.
- * In Edge mode, it fetches stories from the Edge Worker and adds them to the sidebar.
+ * This addon adds a "Source Code" panel to Storybook that displays
+ * the source code of the currently viewed story with syntax highlighting.
  *
- * NOTE: Uses Storybook's manager globals for compatibility with Storybook 9 build system.
+ * Works in both local development and production deployments.
  */
 
-import { addons, types } from 'storybook/manager-api';
-import React, { useEffect, useState, useCallback } from 'react';
+import { addons, types, useStorybookApi, useStorybookState } from 'storybook/manager-api';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 // Addon identifier
 const ADDON_ID = 'story-ui';
-const PANEL_ID = `${ADDON_ID}/generated-stories`;
+const PANEL_ID = `${ADDON_ID}/source-code`;
 
-// Event channels for communication between panel and manager
-export const EVENTS = {
-  STORY_GENERATED: `${ADDON_ID}/story-generated`,
-  REFRESH_STORIES: `${ADDON_ID}/refresh-stories`,
-  SELECT_GENERATED_STORY: `${ADDON_ID}/select-generated-story`,
+// Event channel for receiving generated code from StoryUIPanel
+const EVENTS = {
+  CODE_GENERATED: `${ADDON_ID}/code-generated`,
+  STORY_SELECTED: `${ADDON_ID}/story-selected`,
 };
 
-// Types
-interface GeneratedStory {
-  id: string;
-  title: string;
-  createdAt: number;
-  framework?: string;
-}
-
-/**
- * Get the Edge URL from environment variable.
- * This must be configured via VITE_STORY_UI_EDGE_URL environment variable.
- * No hardcoded URLs - each deployment must configure their own backend.
- *
- * NOTE: Storybook's manager is built with esbuild IIFE format separately from
- * the preview iframe. We need to access the URL through window globals that
- * can be set at runtime via manager-head.html or environment configuration.
- */
-
-// Extend Window interface to include our global
+// Extend Window to include generated stories cache
 declare global {
   interface Window {
-    STORY_UI_EDGE_URL?: string;
+    __STORY_UI_GENERATED_CODE__?: Record<string, string>;
   }
-}
-
-function getEdgeUrl(): string {
-  // Try window global first (can be set via manager-head.html or runtime config)
-  if (typeof window !== 'undefined' && window.STORY_UI_EDGE_URL) {
-    return window.STORY_UI_EDGE_URL;
-  }
-
-  // No fallback - environment variable must be configured
-  return '';
 }
 
 /**
- * Check if we're in Edge mode
+ * Simple Prism-like syntax highlighting for JSX/TSX
+ * Uses inline styles for portability (no external CSS needed)
  */
-function isEdgeMode(): boolean {
-  const edgeUrl = getEdgeUrl();
-  if (edgeUrl) return true;
+const tokenize = (code: string): Array<{ type: string; value: string }> => {
+  const tokens: Array<{ type: string; value: string }> = [];
+  let remaining = code;
 
-  // Check if we're on a production domain
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    return hostname !== 'localhost' && hostname !== '127.0.0.1';
+  const patterns: Array<{ type: string; regex: RegExp }> = [
+    // Comments
+    { type: 'comment', regex: /^(\/\/[^\n]*|\/\*[\s\S]*?\*\/)/ },
+    // Strings (double, single, template)
+    { type: 'string', regex: /^("[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*'|`[^`\\]*(?:\\.[^`\\]*)*`)/ },
+    // JSX tags
+    { type: 'tag', regex: /^(<\/?[A-Z][a-zA-Z0-9.]*|<\/?[a-z][a-z0-9-]*)/ },
+    // Closing tag bracket
+    { type: 'punctuation', regex: /^(\/>|>)/ },
+    // Keywords
+    { type: 'keyword', regex: /^(const|let|var|function|return|export|default|import|from|if|else|for|while|class|extends|new|this|typeof|instanceof|async|await|try|catch|throw|finally)\b/ },
+    // Booleans and null
+    { type: 'boolean', regex: /^(true|false|null|undefined)\b/ },
+    // Numbers
+    { type: 'number', regex: /^-?\d+\.?\d*(e[+-]?\d+)?/ },
+    // Props/attributes (word followed by =)
+    { type: 'attr-name', regex: /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?==)/ },
+    // Function names
+    { type: 'function', regex: /^([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\()/ },
+    // Identifiers
+    { type: 'plain', regex: /^[a-zA-Z_$][a-zA-Z0-9_$]*/ },
+    // Operators
+    { type: 'operator', regex: /^(=>|===|!==|==|!=|<=|>=|&&|\|\||[+\-*/%=<>!&|^~?:])/ },
+    // Punctuation
+    { type: 'punctuation', regex: /^[{}[\]();,.]/ },
+    // Whitespace
+    { type: 'whitespace', regex: /^\s+/ },
+  ];
+
+  while (remaining.length > 0) {
+    let matched = false;
+
+    for (const { type, regex } of patterns) {
+      const match = remaining.match(regex);
+      if (match) {
+        tokens.push({ type, value: match[0] });
+        remaining = remaining.slice(match[0].length);
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      // Unknown character, add as plain
+      tokens.push({ type: 'plain', value: remaining[0] });
+      remaining = remaining.slice(1);
+    }
   }
 
-  return false;
-}
+  return tokens;
+};
 
 /**
- * Simple inline styles (avoiding @storybook/theming)
+ * Color scheme for syntax highlighting (VS Code-like dark theme)
+ */
+const tokenColors: Record<string, React.CSSProperties> = {
+  comment: { color: '#6A9955', fontStyle: 'italic' },
+  string: { color: '#CE9178' },
+  tag: { color: '#569CD6' },
+  keyword: { color: '#C586C0' },
+  boolean: { color: '#569CD6' },
+  number: { color: '#B5CEA8' },
+  'attr-name': { color: '#9CDCFE' },
+  function: { color: '#DCDCAA' },
+  operator: { color: '#D4D4D4' },
+  punctuation: { color: '#D4D4D4' },
+  plain: { color: '#D4D4D4' },
+  whitespace: {},
+};
+
+/**
+ * Syntax Highlighter Component
+ */
+const SyntaxHighlighter: React.FC<{ code: string }> = ({ code }) => {
+  const tokens = useMemo(() => tokenize(code), [code]);
+
+  return (
+    <pre
+      style={{
+        margin: 0,
+        padding: '16px',
+        background: '#1E1E1E',
+        borderRadius: '4px',
+        overflow: 'auto',
+        fontSize: '13px',
+        lineHeight: '1.5',
+        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+      }}
+    >
+      <code>
+        {tokens.map((token, index) => (
+          <span key={index} style={tokenColors[token.type] || {}}>
+            {token.value}
+          </span>
+        ))}
+      </code>
+    </pre>
+  );
+};
+
+/**
+ * Inline styles for the panel
  */
 const styles = {
   container: {
-    padding: '10px',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    background: '#1E1E1E',
+    color: '#D4D4D4',
   },
-  sectionTitle: {
-    fontSize: '11px',
-    fontWeight: 700,
-    color: '#666',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.35em',
-    padding: '10px 0',
-    borderBottom: '1px solid #e0e0e0',
-    marginBottom: '8px',
+  header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  storyList: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-  },
-  storyItem: {
     padding: '8px 12px',
-    cursor: 'pointer',
-    borderRadius: '4px',
-    fontSize: '13px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
+    borderBottom: '1px solid #3C3C3C',
+    background: '#252526',
   },
-  storyItemHover: {
-    background: '#f5f5f5',
+  title: {
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#CCCCCC',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
+  },
+  copyButton: {
+    background: '#0E639C',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    padding: '4px 10px',
+    fontSize: '11px',
+    cursor: 'pointer',
+    fontWeight: 500,
+  },
+  codeContainer: {
+    flex: 1,
+    overflow: 'auto',
+    padding: '0',
   },
   emptyState: {
-    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    color: '#888',
+    fontSize: '13px',
     textAlign: 'center' as const,
-    color: '#666',
-    fontSize: '12px',
+    padding: '20px',
   },
-  refreshButton: {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    padding: '4px',
-    color: '#666',
-    fontSize: '14px',
+  storyInfo: {
+    fontSize: '11px',
+    color: '#888',
+    marginTop: '4px',
   },
 };
 
 /**
- * Generated Stories Panel Component
+ * Source Code Panel Component
  */
-const GeneratedStoriesPanel: React.FC<{ active?: boolean }> = ({ active }) => {
-  const [stories, setStories] = useState<GeneratedStory[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
+  const api = useStorybookApi();
+  const state = useStorybookState();
+  const [sourceCode, setSourceCode] = useState<string>('');
+  const [storyTitle, setStoryTitle] = useState<string>('');
+  const [copied, setCopied] = useState(false);
 
-  const fetchStories = useCallback(async () => {
-    if (!isEdgeMode()) return;
+  // Get the current story ID
+  const currentStoryId = state?.storyId;
 
-    setLoading(true);
-    try {
-      const edgeUrl = getEdgeUrl();
-      const response = await fetch(`${edgeUrl}/story-ui/stories`);
-      if (response.ok) {
-        const data = await response.json();
-        setStories(Array.isArray(data) ? data : []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch generated stories:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // Try to get source code from the story
   useEffect(() => {
-    if (active) {
-      fetchStories();
-    }
-  }, [active, fetchStories]);
+    if (!currentStoryId || !active) return;
 
-  // Listen for story generation events
+    // Get story data from the API
+    const story = api.getData(currentStoryId);
+
+    if (story) {
+      setStoryTitle(story.title || '');
+
+      // Check if this is a generated story (from Story UI)
+      // Generated stories are saved in the Generated folder
+      const isGeneratedStory =
+        story.title?.startsWith('Generated/') ||
+        story.id?.startsWith('generated-') ||
+        currentStoryId.includes('generated');
+
+      // Try to get source from story parameters
+      const storySource = (story as any)?.parameters?.docs?.source?.code ||
+                          (story as any)?.parameters?.storySource?.source ||
+                          (story as any)?.parameters?.source?.code;
+
+      if (storySource) {
+        setSourceCode(storySource);
+      } else if (isGeneratedStory) {
+        // For generated stories, try to get from window cache
+        // Check both window and window.top since StoryUIPanel stores code in top window
+        const topWindow = window.top || window;
+        const cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[currentStoryId] ||
+                          window.__STORY_UI_GENERATED_CODE__?.[currentStoryId];
+        if (cachedCode) {
+          setSourceCode(cachedCode);
+        } else {
+          setSourceCode('');
+        }
+      } else {
+        setSourceCode('');
+      }
+    }
+  }, [currentStoryId, active, api]);
+
+  // Listen for code generated events from StoryUIPanel
   useEffect(() => {
     const channel = addons.getChannel();
+    const topWindow = window.top || window;
 
-    const handleStoryGenerated = (data: GeneratedStory) => {
-      setStories(prev => [data, ...prev.filter(s => s.id !== data.id)]);
+    const handleCodeGenerated = (data: { storyId: string; code: string }) => {
+      // Store in window cache (both local and top window)
+      if (!window.__STORY_UI_GENERATED_CODE__) {
+        window.__STORY_UI_GENERATED_CODE__ = {};
+      }
+      window.__STORY_UI_GENERATED_CODE__[data.storyId] = data.code;
+
+      if (topWindow !== window) {
+        if (!topWindow.__STORY_UI_GENERATED_CODE__) {
+          topWindow.__STORY_UI_GENERATED_CODE__ = {};
+        }
+        topWindow.__STORY_UI_GENERATED_CODE__[data.storyId] = data.code;
+      }
+
+      // If this is the current story, update the display
+      if (data.storyId === currentStoryId) {
+        setSourceCode(data.code);
+      }
     };
 
-    const handleRefresh = () => {
-      fetchStories();
-    };
-
-    channel.on(EVENTS.STORY_GENERATED, handleStoryGenerated);
-    channel.on(EVENTS.REFRESH_STORIES, handleRefresh);
+    channel.on(EVENTS.CODE_GENERATED, handleCodeGenerated);
 
     return () => {
-      channel.off(EVENTS.STORY_GENERATED, handleStoryGenerated);
-      channel.off(EVENTS.REFRESH_STORIES, handleRefresh);
+      channel.off(EVENTS.CODE_GENERATED, handleCodeGenerated);
     };
-  }, [fetchStories]);
+  }, [currentStoryId]);
 
-  const handleStoryClick = useCallback((story: GeneratedStory) => {
-    setActiveStoryId(story.id);
-
-    // Emit event for the preview to pick up
-    const channel = addons.getChannel();
-    channel.emit(EVENTS.SELECT_GENERATED_STORY, story);
-
-    // Navigate to the Generated Story Renderer
-    // The selectStory API is accessible via addons
-    const api = (addons as any).getConfig?.()?.api;
-    if (api?.selectStory) {
-      api.selectStory('storyui-generated--story-renderer');
+  const handleCopy = useCallback(() => {
+    if (sourceCode) {
+      navigator.clipboard.writeText(sourceCode).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
     }
-  }, []);
+  }, [sourceCode]);
 
   if (!active) return null;
 
-  if (!isEdgeMode()) {
+  // No story selected
+  if (!currentStoryId) {
     return (
       <div style={styles.container}>
         <div style={styles.emptyState}>
-          Generated stories appear here in Edge mode.
-          <br />
-          <br />
-          Deploy to Cloudflare Pages to enable this feature.
+          <span>Select a story to view its source code</span>
+        </div>
+      </div>
+    );
+  }
+
+  // No source code available
+  if (!sourceCode) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <span style={styles.title}>Source Code</span>
+        </div>
+        <div style={styles.emptyState}>
+          <span>No source code available for this story</span>
+          <span style={styles.storyInfo}>
+            {storyTitle || currentStoryId}
+          </span>
+          <span style={{ ...styles.storyInfo, marginTop: '12px', maxWidth: '280px' }}>
+            Generate a story using the Story UI panel to see the code here.
+          </span>
         </div>
       </div>
     );
@@ -212,58 +324,31 @@ const GeneratedStoriesPanel: React.FC<{ active?: boolean }> = ({ active }) => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.sectionTitle}>
-        <span>Generated Stories</span>
+      <div style={styles.header}>
+        <span style={styles.title}>Source Code</span>
         <button
-          style={styles.refreshButton}
-          onClick={fetchStories}
-          title="Refresh stories"
+          style={{
+            ...styles.copyButton,
+            background: copied ? '#16825D' : '#0E639C',
+          }}
+          onClick={handleCopy}
         >
-          {loading ? '...' : '\u21bb'}
+          {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
-
-      {stories.length === 0 ? (
-        <div style={styles.emptyState}>
-          {loading ? 'Loading...' : 'No generated stories yet'}
-        </div>
-      ) : (
-        <ul style={styles.storyList}>
-          {stories.map((story) => (
-            <li
-              key={story.id}
-              style={{
-                ...styles.storyItem,
-                ...(hoveredId === story.id || activeStoryId === story.id ? styles.storyItemHover : {}),
-                color: activeStoryId === story.id ? '#1976d2' : '#333',
-              }}
-              onClick={() => handleStoryClick(story)}
-              onMouseEnter={() => setHoveredId(story.id)}
-              onMouseLeave={() => setHoveredId(null)}
-            >
-              <span>&#128214;</span>
-              {story.title}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div style={styles.codeContainer}>
+        <SyntaxHighlighter code={sourceCode} />
+      </div>
     </div>
   );
 };
 
-// Register the addon
+// Register the addon - always register, not just in Edge mode
 addons.register(ADDON_ID, () => {
-  // Only register the Generated panel in Edge mode (production deployments)
-  // In local development, this panel has no functionality
-  if (!isEdgeMode()) {
-    return;
-  }
-
-  // Register the sidebar panel
   addons.add(PANEL_ID, {
     type: types.PANEL,
-    title: 'Generated',
+    title: 'Source Code',
     match: ({ viewMode }) => viewMode === 'story' || viewMode === 'docs',
-    render: ({ active }) => <GeneratedStoriesPanel active={active} />,
+    render: ({ active }) => <SourceCodePanel active={active} />,
   });
 });
