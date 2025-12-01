@@ -1,6 +1,7 @@
 // React import not needed with react-jsx runtime
 import type { Meta, StoryObj } from '@storybook/react';
-import { StoryUIPanel } from '@tpitre/story-ui/panel';
+// Import from local file to avoid npm package dependency issues in Docker
+import { StoryUIPanel } from './StoryUIPanel';
 
 const meta = {
   title: 'Story UI/Story Generator',

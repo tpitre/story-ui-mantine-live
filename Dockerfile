@@ -1,6 +1,6 @@
 # Story UI Live Deployment
 # Runs Storybook in dev mode with Story UI MCP server behind Caddy reverse proxy
-# Build timestamp: 2025-12-01T03:30:00Z - add StoryUI panel + fix Caddy routing
+# Build timestamp: 2025-12-01T03:45:00Z - embed StoryUIPanel component locally
 
 FROM node:20-slim
 
