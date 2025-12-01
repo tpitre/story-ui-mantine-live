@@ -28,6 +28,171 @@ declare global {
 }
 
 /**
+ * Extract clean component usage JSX from a full Storybook story file.
+ *
+ * Transforms:
+ *   import { Button } from '@mantine/core';
+ *   export default { title: 'Generated/Button' };
+ *   export const Default: Story = { render: () => <Button>Click</Button> };
+ *
+ * Into:
+ *   <Button>Click</Button>
+ *
+ * @param fullStoryCode - The complete story file source code
+ * @param variantName - Optional: The specific variant to extract (e.g., "Default", "Variations")
+ */
+const extractUsageCode = (fullStoryCode: string, variantName?: string): string => {
+  // If a specific variant is requested, try to extract just that variant's code
+  if (variantName) {
+    // First, find the variant definition block
+    const variantBlockPattern = new RegExp(
+      `export\\s+const\\s+${variantName}[^=]*=\\s*\\{([\\s\\S]*?)\\};?\\s*(?:export|$)`,
+      'i'
+    );
+    const variantBlockMatch = fullStoryCode.match(variantBlockPattern);
+
+    if (variantBlockMatch) {
+      const variantBlock = variantBlockMatch[1];
+
+      // Try to extract from render function with parentheses: render: () => (...)
+      const renderParensMatch = variantBlock.match(/render:\s*\([^)]*\)\s*=>\s*\(\s*([\s\S]*?)\s*\)\s*,?\s*$/);
+      if (renderParensMatch) {
+        return renderParensMatch[1].trim();
+      }
+
+      // Try to extract from render function without parentheses: render: () => <Component...>
+      const renderNoParensMatch = variantBlock.match(/render:\s*\([^)]*\)\s*=>\s*(<[A-Z][\s\S]*?(?:\/>|<\/[A-Za-z.]+>))\s*,?\s*$/);
+      if (renderNoParensMatch) {
+        return renderNoParensMatch[1].trim();
+      }
+    }
+
+    // Pattern for args-based story: export const VariantName: Story = { args: {...} }
+    const variantArgsPattern = new RegExp(
+      `export\\s+const\\s+${variantName}[^=]*=\\s*\\{[^}]*args:\\s*(\\{[\\s\\S]*?\\})\\s*[,}]`,
+      'i'
+    );
+    const variantArgsMatch = fullStoryCode.match(variantArgsPattern);
+    if (variantArgsMatch) {
+      // Try to find the component from the meta
+      const componentMatch = fullStoryCode.match(/component:\s*([A-Z][A-Za-z0-9]*)/);
+      if (componentMatch) {
+        const componentName = componentMatch[1];
+        try {
+          const argsStr = variantArgsMatch[1];
+          // Extract children if present
+          const childrenMatch = argsStr.match(/children:\s*['"`]([^'"`]+)['"`]/);
+          const children = childrenMatch ? childrenMatch[1] : '';
+
+          // Extract leftSection if present (for badges/buttons with icons)
+          const leftSectionMatch = argsStr.match(/leftSection:\s*(<[^>]+\/>)/);
+          const leftSection = leftSectionMatch ? ` leftSection={${leftSectionMatch[1]}}` : '';
+
+          // Extract other common props
+          const colorMatch = argsStr.match(/color:\s*['"]([^'"]+)['"]/);
+          const variantMatch = argsStr.match(/variant:\s*['"]([^'"]+)['"]/);
+          const sizeMatch = argsStr.match(/size:\s*['"]([^'"]+)['"]/);
+
+          let propsStr = '';
+          if (colorMatch) propsStr += ` color="${colorMatch[1]}"`;
+          if (variantMatch) propsStr += ` variant="${variantMatch[1]}"`;
+          if (sizeMatch) propsStr += ` size="${sizeMatch[1]}"`;
+          propsStr += leftSection;
+
+          if (children) {
+            return `<${componentName}${propsStr}>${children}</${componentName}>`;
+          } else if (propsStr.trim()) {
+            return `<${componentName}${propsStr} />`;
+          }
+          return `<${componentName} />`;
+        } catch {
+          // Fall through to default extraction
+        }
+      }
+    }
+  }
+
+  // Try to extract JSX from render function: render: () => (<JSX>) or render: () => <JSX>
+  // Pattern 1: render: () => (\n  <Component...>\n)
+  const renderWithParensMatch = fullStoryCode.match(/render:\s*\([^)]*\)\s*=>\s*\(\s*([\s\S]*?)\s*\)\s*[,}]/);
+  if (renderWithParensMatch) {
+    const jsx = renderWithParensMatch[1].trim();
+    // Clean up any trailing commas or extra whitespace
+    return jsx.replace(/,\s*$/, '').trim();
+  }
+
+  // Pattern 2: render: () => <Component...> (no parentheses, single line)
+  const renderNoParensMatch = fullStoryCode.match(/render:\s*\([^)]*\)\s*=>\s*(<[A-Z][^,}]*(?:\/>|<\/[A-Za-z.]+>))/s);
+  if (renderNoParensMatch) {
+    return renderNoParensMatch[1].trim();
+  }
+
+  // Pattern 3: Arrow function story: () => (<JSX>)
+  const arrowWithParensMatch = fullStoryCode.match(/export\s+const\s+\w+\s*=\s*\(\)\s*=>\s*\(\s*([\s\S]*?)\s*\)\s*;/);
+  if (arrowWithParensMatch) {
+    const jsx = arrowWithParensMatch[1].trim();
+    return jsx.replace(/,\s*$/, '').trim();
+  }
+
+  // Pattern 4: Arrow function story: () => <Component...>
+  const arrowNoParensMatch = fullStoryCode.match(/export\s+const\s+\w+\s*=\s*\(\)\s*=>\s*(<[A-Z][^;]*(?:\/>|<\/[A-Za-z.]+>))\s*;/s);
+  if (arrowNoParensMatch) {
+    return arrowNoParensMatch[1].trim();
+  }
+
+  // Pattern 5: Look for args-based stories with component prop spreading
+  // e.g., args: { children: 'Click me', color: 'blue' }
+  const argsMatch = fullStoryCode.match(/args:\s*(\{[\s\S]*?\})\s*[,}]/);
+  if (argsMatch) {
+    // Try to find the component from the meta
+    const componentMatch = fullStoryCode.match(/component:\s*([A-Z][A-Za-z0-9]*)/);
+    if (componentMatch) {
+      const componentName = componentMatch[1];
+      try {
+        // Parse the args to generate JSX
+        const argsStr = argsMatch[1];
+        // Extract children if present
+        const childrenMatch = argsStr.match(/children:\s*['"`]([^'"`]+)['"`]/);
+        const children = childrenMatch ? childrenMatch[1] : '';
+
+        // Extract other props (simplified)
+        const propsStr = argsStr
+          .replace(/children:\s*['"`][^'"`]*['"`],?/, '') // Remove children
+          .replace(/^\{|\}$/g, '') // Remove braces
+          .trim();
+
+        if (children) {
+          if (propsStr) {
+            return `<${componentName} ${propsStr.replace(/,\s*$/, '')}>${children}</${componentName}>`;
+          }
+          return `<${componentName}>${children}</${componentName}>`;
+        } else if (propsStr) {
+          return `<${componentName} ${propsStr.replace(/,\s*$/, '')} />`;
+        }
+        return `<${componentName} />`;
+      } catch {
+        // Fall through to return full code
+      }
+    }
+  }
+
+  // Pattern 6: Look for any JSX block starting with < and ending with /> or </Component>
+  // This is a fallback for any JSX we can find
+  const jsxBlockMatch = fullStoryCode.match(/(<[A-Z][a-zA-Z0-9.]*[\s\S]*?(?:\/>|<\/[A-Za-z.]+>))/);
+  if (jsxBlockMatch) {
+    // Don't return if it looks like an import or type definition
+    const match = jsxBlockMatch[1];
+    if (!match.includes('import') && !match.includes('Meta<') && !match.includes('StoryObj<')) {
+      return match.trim();
+    }
+  }
+
+  // If no patterns matched, return the original code
+  // (better than showing nothing)
+  return fullStoryCode;
+};
+
+/**
  * Simple Prism-like syntax highlighting for JSX/TSX
  * Uses inline styles for portability (no external CSS needed)
  */
@@ -203,9 +368,51 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
   const [sourceCode, setSourceCode] = useState<string>('');
   const [storyTitle, setStoryTitle] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [showFullCode, setShowFullCode] = useState(false);
 
-  // Get the current story ID
+  // Get the current story ID first (needed by other useMemo hooks)
   const currentStoryId = state?.storyId;
+
+  // Extract the variant name from the story ID (e.g., "generated-button--default" -> "Default")
+  const variantName = useMemo(() => {
+    if (!currentStoryId) return '';
+    const parts = currentStoryId.split('--');
+    if (parts.length >= 2) {
+      // Convert kebab-case to PascalCase: "my-variant" -> "MyVariant"
+      return parts[parts.length - 1]
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join('');
+    }
+    return 'Default';
+  }, [currentStoryId]);
+
+  // Extract the file name from the story ID (e.g., "generated-purple-badge--default" -> "purple-badge")
+  const storyFileName = useMemo(() => {
+    if (!currentStoryId) return '';
+    // Remove "generated-" prefix and "--variant" suffix
+    let name = currentStoryId.replace(/^generated-/, '');
+    const variantIndex = name.lastIndexOf('--');
+    if (variantIndex > 0) {
+      name = name.substring(0, variantIndex);
+    }
+    return name;
+  }, [currentStoryId]);
+
+  // Memoize the extracted usage code (for toggle button visibility check)
+  const extractedUsageCode = useMemo(() => {
+    if (!sourceCode) return '';
+    return extractUsageCode(sourceCode, variantName);
+  }, [sourceCode, variantName]);
+
+  // Check if usage code extraction is different from full source (determines toggle visibility)
+  const hasUsageCode = sourceCode !== '' && extractedUsageCode !== sourceCode;
+
+  // Memoize the display code (what actually shows in the panel)
+  const displayCode = useMemo(() => {
+    if (!sourceCode) return '';
+    return showFullCode ? sourceCode : extractedUsageCode;
+  }, [sourceCode, showFullCode, extractedUsageCode]);
 
   // Try to get source code from the story
   useEffect(() => {
@@ -214,15 +421,11 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
     // Get story data from the API
     const story = api.getData(currentStoryId);
 
+    // Check if this is a generated story based on ID (works even if story doesn't exist in Storybook yet)
+    const isGeneratedStory = currentStoryId.includes('generated');
+
     if (story) {
       setStoryTitle(story.title || '');
-
-      // Check if this is a generated story (from Story UI)
-      // Generated stories are saved in the Generated folder
-      const isGeneratedStory =
-        story.title?.startsWith('Generated/') ||
-        story.id?.startsWith('generated-') ||
-        currentStoryId.includes('generated');
 
       // Try to get source from story parameters
       const storySource = (story as any)?.parameters?.docs?.source?.code ||
@@ -231,22 +434,80 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
 
       if (storySource) {
         setSourceCode(storySource);
-      } else if (isGeneratedStory) {
-        // For generated stories, try to get from window cache
-        // Check both window and window.top since StoryUIPanel stores code in top window
+        return;
+      }
+    } else {
+      // Story doesn't exist in Storybook yet, set title from story ID
+      setStoryTitle(currentStoryId);
+    }
+
+    // For generated stories, fetch source code from the Vite plugin API
+    if (isGeneratedStory && storyFileName) {
+      // First try the Vite plugin API to get fresh source code
+      const fetchSourceCode = async () => {
+        try {
+          // Try fetching from the Vite raw source plugin
+          const response = await fetch(`/api/raw-source?file=${encodeURIComponent(storyFileName)}&isEdited=false`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.source) {
+              console.log('[Story UI] Loaded source from API for:', storyFileName);
+              setSourceCode(data.source);
+              return;
+            }
+          }
+        } catch (e) {
+          console.log('[Story UI] API fetch failed, falling back to cache:', e);
+        }
+
+        // Fallback to localStorage/memory cache
         const topWindow = window.top || window;
-        const cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[currentStoryId] ||
+
+        // Try exact match first
+        let cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[currentStoryId] ||
                           window.__STORY_UI_GENERATED_CODE__?.[currentStoryId];
+
+        // If not found, try to find any story from the same file (e.g., try --default if viewing --variations)
+        if (!cachedCode) {
+          const baseStoryId = `generated-${storyFileName}--default`;
+          cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[baseStoryId] ||
+                        window.__STORY_UI_GENERATED_CODE__?.[baseStoryId];
+        }
+
+        // If not in memory cache, check localStorage (survives page navigation)
+        if (!cachedCode) {
+          try {
+            const stored = JSON.parse(localStorage.getItem('storyui_generated_code') || '{}');
+            cachedCode = stored[currentStoryId];
+            // Also try the base story ID
+            if (!cachedCode) {
+              const baseStoryId = `generated-${storyFileName}--default`;
+              cachedCode = stored[baseStoryId];
+            }
+            // Restore to memory cache if found
+            if (cachedCode) {
+              if (!topWindow.__STORY_UI_GENERATED_CODE__) {
+                topWindow.__STORY_UI_GENERATED_CODE__ = {};
+              }
+              topWindow.__STORY_UI_GENERATED_CODE__[currentStoryId] = cachedCode;
+            }
+          } catch (e) {
+            console.warn('[Story UI] Failed to read from localStorage:', e);
+          }
+        }
+
         if (cachedCode) {
           setSourceCode(cachedCode);
         } else {
           setSourceCode('');
         }
-      } else {
-        setSourceCode('');
-      }
+      };
+
+      fetchSourceCode();
+    } else {
+      setSourceCode('');
     }
-  }, [currentStoryId, active, api]);
+  }, [currentStoryId, active, api, storyFileName]);
 
   // Listen for code generated events from StoryUIPanel
   useEffect(() => {
@@ -281,13 +542,13 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
   }, [currentStoryId]);
 
   const handleCopy = useCallback(() => {
-    if (sourceCode) {
-      navigator.clipboard.writeText(sourceCode).then(() => {
+    if (displayCode) {
+      navigator.clipboard.writeText(displayCode).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       });
     }
-  }, [sourceCode]);
+  }, [displayCode]);
 
   if (!active) return null;
 
@@ -325,7 +586,26 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <span style={styles.title}>Source Code</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={styles.title}>{showFullCode ? 'Full Story' : 'Usage Code'}</span>
+          {hasUsageCode && (
+            <button
+              style={{
+                background: 'transparent',
+                color: '#888',
+                border: '1px solid #555',
+                borderRadius: '4px',
+                padding: '2px 8px',
+                fontSize: '10px',
+                cursor: 'pointer',
+                fontWeight: 400,
+              }}
+              onClick={() => setShowFullCode(!showFullCode)}
+            >
+              {showFullCode ? 'Show Usage' : 'Show Full'}
+            </button>
+          )}
+        </div>
         <button
           style={{
             ...styles.copyButton,
@@ -337,7 +617,7 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
         </button>
       </div>
       <div style={styles.codeContainer}>
-        <SyntaxHighlighter code={sourceCode} />
+        <SyntaxHighlighter code={displayCode} />
       </div>
     </div>
   );
