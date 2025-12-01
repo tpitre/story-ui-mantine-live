@@ -1,0 +1,8 @@
+[start]
+cmd = "./start-production.sh"
+
+[phases.install]
+cmds = ["npm install"]
+
+[phases.build]
+cmds = []

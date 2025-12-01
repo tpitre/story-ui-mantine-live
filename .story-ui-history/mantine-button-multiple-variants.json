@@ -1,0 +1,14 @@
+{
+  "storyId": "mantine-button-multiple-variants",
+  "title": "Mantine Button Multiple Variants",
+  "versions": [
+    {
+      "id": "7ecd1661e89bbf7f",
+      "timestamp": 1764363083105,
+      "prompt": "Create a simple Mantine Button with multiple variants",
+      "code": "import React from 'react';\nimport type { Meta, StoryObj } from '@storybook/react';\nimport { Button, Stack } from '@mantine/core';\n\nconst meta = {\n  title: 'Generated/Mantine Button - Multiple Variants',\n  component: Button,\n  parameters: {\n    layout: 'centered',\n  },\n} satisfies Meta<typeof Button>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Filled: Story = {\n  args: {\n    Filled Button',\n    variant: 'filled',\n  },\n};\n\nexport const Light: Story = {\n  args: {\n    Light Button',\n    variant: 'light',\n  },\n};\n\nexport const Outline: Story = {\n  args: {\n    Outline Button',\n    variant: 'outline',\n  },\n};\n\nexport const Subtle: Story = {\n  args: {\n    Subtle Button',\n    variant: 'subtle',\n  },\n};\n\nexport const Transparent: Story = {\n  args: {\n    Transparent Button',\n    variant: 'transparent',\n  },\n};\n\nexport const White: Story = {\n  args: {\n    White Button',\n    variant: 'white',\n  },\n};\n\nexport const Gradient: Story = {\n  args: {\n    Gradient Button',\n    variant: 'gradient',\n    gradient: { from: 'blue', to: 'cyan', deg: 90 },\n  },\n};\n\nexport const AllVariants: Story = {\n  render: () => (\n    <Stack gap=\"md\">\n      <Button variant=\"filled\">Filled Button</Button>\n      <Button variant=\"light\">Light Button</Button>\n      <Button variant=\"outline\">Outline Button</Button>\n      <Button variant=\"subtle\">Subtle Button</Button>\n      <Button variant=\"transparent\">Transparent Button</Button>\n      <Button variant=\"white\">White Button</Button>\n      <Button variant=\"gradient\" gradient={{ from: 'blue', to: 'cyan', deg: 90 }}>\n        Gradient Button\n      </Button>\n    </Stack>\n  ),\n};",
+      "fileName": "mantine-button-multiple-variants-2cbf073c.stories.tsx"
+    }
+  ],
+  "currentVersionId": "7ecd1661e89bbf7f"
+}

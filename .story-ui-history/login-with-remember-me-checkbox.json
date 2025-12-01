@@ -1,0 +1,14 @@
+{
+  "storyId": "login-with-remember-me-checkbox",
+  "title": "Login With Remember Me Checkbox",
+  "versions": [
+    {
+      "id": "50ad0453c6246625",
+      "timestamp": 1764357355360,
+      "prompt": "Add a remember me checkbox below the password field",
+      "code": "import React from 'react';\nimport type { Meta, StoryObj } from '@storybook/react';\nimport { Card, Stack, TextInput, PasswordInput, Checkbox, Button, Title, Text, Anchor } from '@mantine/core';\n\nconst meta = {\n  title: 'Generated/Login with Remember Me Checkbox',\n  parameters: {\n    layout: 'centered',\n  },\n} satisfies Meta;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Default: Story = {\n  render: () => (\n    <Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder style={{ width: 400 }}>\n      <Stack gap=\"md\">\n        <Stack gap=\"xs\">\n          <Title order={2}>Welcome Back</Title>\n          <Text size=\"sm\" c=\"dimmed\">\n            Sign in to your account to continue\n          </Text>\n        </Stack>\n\n        <TextInput\n          label=\"Email\"\n          placeholder=\"your@email.com\"\n          required\n        />\n\n        <PasswordInput\n          label=\"Password\"\n          placeholder=\"Enter your password\"\n          required\n        />\n\n        <Checkbox\n          label=\"Remember me\"\n          size=\"sm\"\n        />\n\n        <Button fullWidth>\n          Sign In\n        </Button>\n\n        <Text size=\"sm\" ta=\"center\" c=\"dimmed\">\n          Don't have an account?{' '}\n          <Anchor href=\"#\" size=\"sm\">\n            Sign up\n          </Anchor>\n        </Text>\n      </Stack>\n    </Card>\n  ),\n};\n\nexport const WithRememberMeChecked: Story = {\n  render: () => (\n    <Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder style={{ width: 400 }}>\n      <Stack gap=\"md\">\n        <Stack gap=\"xs\">\n          <Title order={2}>Welcome Back</Title>\n          <Text size=\"sm\" c=\"dimmed\">\n            Sign in to your account to continue\n          </Text>\n        </Stack>\n\n        <TextInput\n          label=\"Email\"\n          placeholder=\"your@email.com\"\n          required\n        />\n\n        <PasswordInput\n          label=\"Password\"\n          placeholder=\"Enter your password\"\n          required\n        />\n\n        <Checkbox\n          label=\"Remember me\"\n          size=\"sm\"\n          defaultChecked\n        />\n\n        <Button fullWidth>\n          Sign In\n        </Button>\n\n        <Text size=\"sm\" ta=\"center\" c=\"dimmed\">\n          Don't have an account?{' '}\n          <Anchor href=\"#\" size=\"sm\">\n            Sign up\n          </Anchor>\n        </Text>\n      </Stack>\n    </Card>\n  ),\n};",
+      "fileName": "login-with-remember-me-checkbox-30b35cce.stories.tsx"
+    }
+  ],
+  "currentVersionId": "50ad0453c6246625"
+}

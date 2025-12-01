@@ -1,0 +1,14 @@
+{
+  "storyId": "two-buttons",
+  "title": "Two Buttons",
+  "versions": [
+    {
+      "id": "8555a9666bd091c2",
+      "timestamp": 1764427915352,
+      "prompt": "Show me two buttons.",
+      "code": "import React from 'react';\nimport type { Meta, StoryObj } from '@storybook/react';\nimport { Button, Group } from '@mantine/core';\n\nconst meta = {\n  title: 'Generated/Two Buttons',\n  parameters: {\n    layout: 'centered',\n  },\n} satisfies Meta;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Default: Story = {\n  render: () => (\n    <div style={{ fontFamily: 'Comic Sans MS, cursive', padding: '32px' }}>\n      <Group gap=\"md\" justify=\"center\">\n        <Button color=\"grape\" size=\"md\">\n          FIRST BUTTON\n        </Button>\n        <Button color=\"grape\" size=\"md\">\n          SECOND BUTTON\n        </Button>\n      </Group>\n    </div>\n  ),\n};",
+      "fileName": "two-buttons-32614a3a.stories.tsx"
+    }
+  ],
+  "currentVersionId": "8555a9666bd091c2"
+}

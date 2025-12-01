@@ -1,0 +1,332 @@
+/**
+ * AI Design System Documentation - Auto-generated
+ *
+ * This file contains ALL design system documentation for the AI:
+ * - Guidelines from story-ui-docs/ directory
+ * - Design tokens (colors, spacing, typography, etc.)
+ * - Component-specific documentation
+ * - Layout patterns
+ * - Accessibility rules
+ * - Legacy considerations from story-ui-considerations.md
+ */
+
+export const aiConsiderations = "\n\n📚 DESIGN SYSTEM DOCUMENTATION:\n\n## getting-started\n# Mantine Getting Started Guide\nSource: https://mantine.dev/getting-started/\n\n## Installation Methods\n\n### Quick Start with Templates\nThe easiest approach uses pre-configured templates with dependencies and settings:\n\n**Recommended:**\n- Next.js (app or pages router)\n- Vite (full or minimal setup)\n\n**Additional frameworks:**\n- Gatsby, RedwoodJS, React Router\n\n## Manual Setup Process\n\n### 1. Install Core Dependencies\n```bash\nnpm install @mantine/core @mantine/hooks\n```\n\n### 2. Add PostCSS Configuration\nInstall build tools:\n```bash\nnpm install postcss postcss-preset-mantine postcss-simple-vars\n```\n\nCreate `postcss.config.cjs`:\n```javascript\nmodule.exports = {\n  plugins: {\n    'postcss-preset-mantine': {},\n    'postcss-simple-vars': {\n      variables: {\n        'mantine-breakpoint-xs': '36em',\n        'mantine-breakpoint-sm': '48em',\n        'mantine-breakpoint-md': '62em',\n        'mantine-breakpoint-lg': '75em',\n        'mantine-breakpoint-xl': '88em',\n      },\n    },\n  },\n};\n```\n\n### 3. Import Styles\nAdd to your root application file:\n```typescript\nimport '@mantine/core/styles.css';\n```\n\nAdditional packages require their own CSS imports:\n- `@mantine/dates` → `import '@mantine/dates/styles.css';`\n- `@mantine/dropzone` → `import '@mantine/dropzone/styles.css';`\n- `@mantine/notifications` → `import '@mantine/notifications/styles.css';`\n\n### 4. Wrap with MantineProvider\n```tsx\nimport { createTheme, MantineProvider } from '@mantine/core';\n\nconst theme = createTheme({\n  // customizations here\n});\n\nfunction App() {\n  return (\n    <MantineProvider theme={theme}>\n      {/* application content */}\n    </MantineProvider>\n  );\n}\n```\n\n### 5. Server-Side Rendering Setup\nAdd `ColorSchemeScript` to document head for SSR applications:\n```tsx\nimport { ColorSchemeScript } from '@mantine/core';\n\n// In your document head\n<ColorSchemeScript />\n```\n\n## VS Code Configuration\nInstall PostCSS syntax highlighting extension and CSS variable autocomplete. Configure `.vscode/settings.json` to include `node_modules/@mantine/core/styles.css` for variable recognition.\n\n\n\n## Component Documentation from guidelines/component-usage.md\n# Mantine Component Usage Guidelines\nSource: https://mantine.dev/getting-started/\n\n## Import Pattern\n\nAlways import from `@mantine/core`:\n```tsx\nimport { Button, Text, Card, Group, Stack } from '@mantine/core';\n```\n\n## Required Provider\n\nAll components must be wrapped with MantineProvider:\n```tsx\nimport { MantineProvider } from '@mantine/core';\n\n<MantineProvider>\n  {/* Your app */}\n</MantineProvider>\n```\n\n## Common Style Props\n\nAll components support these inline style props:\n- Margin: `m`, `mt`, `mb`, `ml`, `mr`, `mx`, `my`\n- Padding: `p`, `pt`, `pb`, `pl`, `pr`, `px`, `py`\n- Width/Height: `w`, `h`, `miw`, `maw`, `mih`, `mah`\n- Color: `c` (text color), `bg` (background)\n\n## Responsive Props\n\nUse object syntax for responsive values:\n```tsx\n<Button size={{ base: 'sm', md: 'md', lg: 'lg' }}>\n  Responsive Button\n</Button>\n```\n\n## Polymorphic Components\n\nMany components support `component` prop:\n```tsx\n<Button component=\"a\" href=\"/page\">Link Button</Button>\n<Card component=\"article\">Article Card</Card>\n```\n\n\n\n## accessibility\n# Mantine Accessibility Guidelines\nSource: https://mantine.dev/\n\n## Core Principles\n\nMantine components are built with accessibility in mind and support WCAG 2.1 AA compliance out of the box.\n\n## Form Accessibility\n\nAlways provide labels for inputs:\n```tsx\n// Label prop (recommended)\n<TextInput label=\"Email\" />\n\n// Or use aria-label\n<TextInput aria-label=\"Email address\" />\n```\n\n## Icon Buttons\n\nAlways provide aria-label for icon-only buttons:\n```tsx\n<ActionIcon aria-label=\"Close dialog\">\n  <IconX />\n</ActionIcon>\n```\n\n## Focus Management\n\n- All interactive components have visible focus rings by default\n- Configured via `theme.focusRing` (auto | always | never)\n- Use `FocusTrap` component for modals and dropdowns\n\n## Keyboard Navigation\n\n- All Mantine components support keyboard navigation\n- `Enter` and `Space` activate buttons\n- `Escape` closes modals and dropdowns\n- Arrow keys navigate menus and selects\n\n\n\n## Component Documentation from components/text.md\n# Text & Typography Components\nSource: https://mantine.dev/core/text/\n\n## Import\n```tsx\nimport { Text, Title, Anchor, Code, Highlight, Mark } from '@mantine/core';\n```\n\n## Text Component\n\nDisplays text content with customizable styling options. Polymorphic component with `<p>` as default element.\n\n### Size Options\n```tsx\n<Text size=\"xs\">Extra small (12px)</Text>\n<Text size=\"sm\">Small (14px)</Text>\n<Text size=\"md\">Medium (16px) - default</Text>\n<Text size=\"lg\">Large (18px)</Text>\n<Text size=\"xl\">Extra large (20px)</Text>\n```\n\n### Font Weight\n```tsx\n<Text fw={400}>Normal</Text>\n<Text fw={500}>Medium (semibold)</Text>\n<Text fw={700}>Bold</Text>\n```\n\n### Color\n```tsx\n<Text>Default color</Text>\n<Text c=\"dimmed\">Dimmed/secondary text</Text>\n<Text c=\"blue\">Blue text</Text>\n<Text c=\"red\">Red text</Text>\n<Text c=\"teal.4\">Teal shade 4</Text>\n```\n\n### Text Styling\n```tsx\n<Text fs=\"italic\">Italic text</Text>\n<Text td=\"underline\">Underlined text</Text>\n<Text td=\"line-through\">Strikethrough text</Text>\n<Text tt=\"uppercase\">Uppercase text</Text>\n<Text tt=\"capitalize\">Capitalized text</Text>\n```\n\n### Alignment\n```tsx\n<Text ta=\"left\">Left aligned (default)</Text>\n<Text ta=\"center\">Center aligned</Text>\n<Text ta=\"right\">Right aligned</Text>\n```\n\n### Truncation\n```tsx\n// Single line truncation with ellipsis\n<Text truncate=\"end\">\n  Long text that will be truncated at the end...\n</Text>\n\n// Multi-line clamping (uses CSS -webkit-line-clamp)\n<Text lineClamp={2}>\n  Text that spans multiple lines will be clamped\n  to 2 lines maximum with ellipsis...\n</Text>\n```\n\n### Gradient Text\n```tsx\n<Text\n  variant=\"gradient\"\n  gradient={{ from: 'blue', to: 'cyan', deg: 90 }}\n  fw={700}\n  size=\"xl\"\n>\n  Gradient Text\n</Text>\n```\n\n### Inheritance\nUse `inherit` prop to preserve parent element's font styles:\n```tsx\n<Title order={1}>\n  Title with <Text inherit c=\"blue\" span>highlighted</Text> word\n</Title>\n```\n\n### Span Shorthand\nUse `span` prop as shorthand for `component=\"span\"`:\n```tsx\n<Text span>Inline text</Text>\n// Equivalent to:\n<Text component=\"span\">Inline text</Text>\n```\n\n## Title Component\n\nFor headings, use Title with `order` prop (1-6):\n\n```tsx\n<Title order={1}>H1 Heading (34px)</Title>\n<Title order={2}>H2 Heading (26px)</Title>\n<Title order={3}>H3 Heading (22px)</Title>\n<Title order={4}>H4 Heading (18px)</Title>\n<Title order={5}>H5 Heading (16px)</Title>\n<Title order={6}>H6 Heading (14px)</Title>\n\n// Override visual size while keeping semantic level\n<Title order={2} size=\"h1\">H2 with H1 styling</Title>\n```\n\n## Anchor Component\n\nFor links:\n```tsx\n<Anchor href=\"https://example.com\">External link</Anchor>\n<Anchor href=\"/page\" underline=\"hover\">Underline on hover</Anchor>\n<Anchor href=\"/page\" underline=\"always\">Always underlined</Anchor>\n<Anchor href=\"/page\" underline=\"never\">Never underlined</Anchor>\n```\n\n## Code Component\n\nFor inline and block code:\n```tsx\n// Inline code\n<Code>npm install @mantine/core</Code>\n<Code color=\"blue\">const x = 1;</Code>\n\n// Code block\n<Code block>\n{`function hello() {\n  console.log(\"Hello World\");\n}`}\n</Code>\n```\n\n## Highlight Component\n\nHighlight specific text:\n```tsx\n<Highlight highlight=\"important\">\n  This is important text that should stand out.\n</Highlight>\n\n// Multiple highlights\n<Highlight highlight={[\"first\", \"second\"]}>\n  Highlight first and second words.\n</Highlight>\n```\n\n## Mark Component\n\nFor marked/highlighted inline text:\n```tsx\n<Text>\n  This has <Mark>marked text</Mark> inside.\n</Text>\n```\n\n## Common Patterns\n\n### Page Header\n```tsx\n<Stack gap=\"xs\">\n  <Title order={1}>Page Title</Title>\n  <Text size=\"lg\" c=\"dimmed\">\n    A brief description of what this page contains.\n  </Text>\n</Stack>\n```\n\n### Section Header\n```tsx\n<Stack gap={4}>\n  <Title order={3}>Section Title</Title>\n  <Text size=\"sm\" c=\"dimmed\">\n    Additional context for this section.\n  </Text>\n</Stack>\n```\n\n### Label + Value\n```tsx\n<Group gap=\"xs\">\n  <Text size=\"sm\" c=\"dimmed\">Status:</Text>\n  <Text size=\"sm\" fw={500}>Active</Text>\n</Group>\n```\n\n\n\n## Component Documentation from components/layout.md\n# Layout Components\nSource: https://mantine.dev/core/stack/, https://mantine.dev/core/group/\n\n## Import\n```tsx\nimport { Stack, Group, Flex, Container, Grid, SimpleGrid } from '@mantine/core';\n```\n\n## Stack Component\n\nVertical flex container for composing elements and components vertically.\n\n### Basic Usage\n```tsx\n<Stack gap=\"md\">\n  <Button>First</Button>\n  <Button>Second</Button>\n  <Button>Third</Button>\n</Stack>\n```\n\n### Props\n\n| Prop | Type | Default | Description |\n|------|------|---------|-------------|\n| gap | xs \\| sm \\| md \\| lg \\| xl | md | Spacing between children |\n| align | string | stretch | Vertical alignment (stretch, center, flex-start, flex-end) |\n| justify | string | flex-start | Space distribution (center, flex-start, flex-end, space-between, space-around) |\n\n### Example\n```tsx\n<Stack\n  h={300}\n  bg=\"var(--mantine-color-body)\"\n  align=\"stretch\"\n  justify=\"center\"\n  gap=\"md\"\n>\n  <Button>Item 1</Button>\n  <Button>Item 2</Button>\n  <Button>Item 3</Button>\n</Stack>\n```\n\n## Group Component\n\nHorizontal flex container for composing elements and components. For vertical layouts, use Stack instead.\n\n### Basic Usage\n```tsx\n<Group>\n  <Button variant=\"default\">First</Button>\n  <Button variant=\"default\">Second</Button>\n  <Button variant=\"default\">Third</Button>\n</Group>\n```\n\n### Props\n\n| Prop | Type | Default | Description |\n|------|------|---------|-------------|\n| gap | xs \\| sm \\| md \\| lg \\| xl | md | Spacing between children |\n| justify | string | flex-start | Horizontal alignment |\n| grow | boolean | false | Allow children to expand and fill space |\n| wrap | string | wrap | Whether children wrap to new lines ('nowrap' to disable) |\n| preventGrowOverflow | boolean | true | Limit each child to (1/children.length) × 100% of parent width |\n\n### Justify Options\n```tsx\n<Group justify=\"flex-start\">Left aligned (default)</Group>\n<Group justify=\"center\">Center aligned</Group>\n<Group justify=\"space-between\">Space between</Group>\n<Group justify=\"flex-end\">Right aligned</Group>\n```\n\n### Grow Behavior\n```tsx\n// Children expand to fill available space\n<Group grow>\n  <Button>First</Button>\n  <Button>Second</Button>\n</Group>\n\n// With preventGrowOverflow={false}, children grow based on content\n<Group grow preventGrowOverflow={false}>\n  <Button>Short</Button>\n  <Button>Much Longer Button Text</Button>\n</Group>\n```\n\n### Important Constraints\n\nGroup requires actual React elements. **Strings, numbers, fragments may have incorrect styles if grow prop is set.**\n\n```tsx\n// ❌ Avoid with grow\n<Group grow>\n  Some text\n  <Button>Button</Button>\n</Group>\n\n// ✅ Correct\n<Group grow>\n  <Text>Some text</Text>\n  <Button>Button</Button>\n</Group>\n```\n\n## Flex Component\n\nAdvanced flex control for complex layouts:\n\n```tsx\n<Flex\n  gap=\"md\"\n  justify=\"space-between\"\n  align=\"center\"\n  direction=\"row\"\n  wrap=\"wrap\"\n>\n  <Text>Left content</Text>\n  <Button>Right button</Button>\n</Flex>\n```\n\n## Container Component\n\nCenters content with max-width:\n\n```tsx\n<Container size=\"md\">\n  {/* Content centered with max-width */}\n</Container>\n\n// Available sizes: xs, sm, md, lg, xl\n```\n\n## Grid Component\n\nResponsive grid layout:\n\n```tsx\n<Grid>\n  <Grid.Col span={6}>Half width</Grid.Col>\n  <Grid.Col span={6}>Half width</Grid.Col>\n</Grid>\n\n// Responsive columns\n<Grid>\n  <Grid.Col span={{ base: 12, sm: 6, lg: 4 }}>\n    Responsive column\n  </Grid.Col>\n</Grid>\n```\n\n## SimpleGrid Component\n\nEqual-width columns:\n\n```tsx\n<SimpleGrid cols={3} spacing=\"lg\">\n  <Card>Card 1</Card>\n  <Card>Card 2</Card>\n  <Card>Card 3</Card>\n</SimpleGrid>\n\n// Responsive columns\n<SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing=\"lg\">\n  <Card>Card 1</Card>\n  <Card>Card 2</Card>\n  <Card>Card 3</Card>\n</SimpleGrid>\n```\n\n## Browser Support Note\n\nStack and Group use flexbox gap. In older browsers, children may not have spacing. Install flex-gap-polyfill PostCSS plugin for legacy browser support.\n\n\n\n## Component Documentation from components/inputs.md\n# Input Components\nSource: https://mantine.dev/core/text-input/, https://mantine.dev/core/select/\n\n## Import\n```tsx\nimport {\n  TextInput,\n  PasswordInput,\n  NumberInput,\n  Textarea,\n  Select,\n  Checkbox,\n  Radio,\n  Switch\n} from '@mantine/core';\n```\n\n## TextInput\n\nCapture string input from user. Extends Input and Input.Wrapper functionality.\n\n### Basic Usage\n```tsx\n<TextInput\n  label=\"Username\"\n  placeholder=\"Enter username\"\n/>\n```\n\n### Full Example\n```tsx\n<TextInput\n  label=\"Email\"\n  description=\"We'll never share your email\"\n  placeholder=\"your@email.com\"\n  error=\"Invalid email format\"\n  required\n  withAsterisk\n/>\n```\n\n### Props\n\n| Prop | Type | Description |\n|------|------|-------------|\n| label | string | Input label |\n| description | string | Descriptive text below label |\n| placeholder | string | Hint text inside input |\n| error | boolean \\| string | Error state or message |\n| disabled | boolean | Disables user interaction |\n| required | boolean | Marks as required |\n| withAsterisk | boolean | Shows asterisk in label |\n| variant | 'default' \\| 'filled' \\| 'unstyled' | Visual style |\n| size | xs \\| sm \\| md \\| lg \\| xl | Input size |\n| radius | xs \\| sm \\| md \\| lg \\| xl | Border radius |\n\n### With Sections (Icons)\n```tsx\nimport { IconAt, IconLock } from '@tabler/icons-react';\n\n// Left section (e.g., icon)\n<TextInput\n  label=\"Email\"\n  placeholder=\"your@email.com\"\n  leftSection={<IconAt size={16} />}\n  leftSectionPointerEvents=\"none\"\n/>\n\n// Right section\n<TextInput\n  label=\"Password\"\n  rightSection={<IconLock size={16} />}\n  rightSectionPointerEvents=\"none\"\n/>\n```\n\n### Accessibility\n- Always pair with `label` prop or set `aria-label` attribute\n- Input requires label association for proper screen reader announcement\n\n## Select\n\nCapture user input from predefined suggestions. Unlike Autocomplete, it doesn't permit custom values.\n\n### Basic Usage\n```tsx\n<Select\n  label=\"Country\"\n  placeholder=\"Select country\"\n  data={['USA', 'Canada', 'UK', 'Germany']}\n/>\n```\n\n### Data Formats\n```tsx\n// Simple string array\ndata={['React', 'Angular', 'Vue']}\n\n// Object format with value/label\ndata={[\n  { value: 'react', label: 'React' },\n  { value: 'angular', label: 'Angular', disabled: true },\n  { value: 'vue', label: 'Vue' },\n]}\n\n// Grouped options\ndata={[\n  { group: 'Frontend', items: ['React', 'Vue'] },\n  { group: 'Backend', items: ['Node', 'Python'] },\n]}\n```\n\n### Key Props\n\n| Prop | Type | Description |\n|------|------|-------------|\n| searchable | boolean | Enables filtering by typing |\n| clearable | boolean | Shows clear button |\n| allowDeselect | boolean | Allow clicking selected to deselect (default: true) |\n| nothingFoundMessage | string | Message when search yields no results |\n| limit | number | Max options to render (for large datasets) |\n| maxDropdownHeight | number | Scrollable dropdown height |\n| checkIconPosition | 'left' \\| 'right' | Position of check icon |\n\n### Searchable Select\n```tsx\n<Select\n  label=\"Search countries\"\n  placeholder=\"Type to search\"\n  data={countries}\n  searchable\n  nothingFoundMessage=\"No matches found\"\n/>\n```\n\n### Clearable Select\n```tsx\n<Select\n  label=\"Optional selection\"\n  data={options}\n  clearable\n/>\n```\n\n### Large Dataset Performance\n```tsx\n// Limit rendered options for 100,000+ items\n<Select\n  label=\"Select item\"\n  data={largeDataset}\n  limit={5}\n  searchable\n/>\n```\n\n## Checkbox\n\n```tsx\n// Single checkbox\n<Checkbox label=\"I agree to terms\" />\n\n// Checkbox group\n<Checkbox.Group\n  label=\"Select features\"\n  description=\"Choose all that apply\"\n  value={selected}\n  onChange={setSelected}\n>\n  <Stack mt=\"xs\">\n    <Checkbox value=\"feature1\" label=\"Feature 1\" />\n    <Checkbox value=\"feature2\" label=\"Feature 2\" />\n    <Checkbox value=\"feature3\" label=\"Feature 3\" />\n  </Stack>\n</Checkbox.Group>\n```\n\n## Radio\n\n```tsx\n<Radio.Group\n  label=\"Select option\"\n  value={value}\n  onChange={setValue}\n>\n  <Stack mt=\"xs\">\n    <Radio value=\"option1\" label=\"Option 1\" />\n    <Radio value=\"option2\" label=\"Option 2\" />\n    <Radio value=\"option3\" label=\"Option 3\" />\n  </Stack>\n</Radio.Group>\n```\n\n## Switch\n\n```tsx\n<Switch label=\"Enable notifications\" />\n\n<Switch\n  label=\"Dark mode\"\n  onLabel=\"ON\"\n  offLabel=\"OFF\"\n  size=\"md\"\n/>\n```\n\n## Styles API\n\nTarget these elements with `classNames` prop:\n- `wrapper` - Root wrapper\n- `input` - Input element\n- `section` - Left/right section\n- `root` - Component root\n- `label` - Label text\n- `required` - Required asterisk\n- `description` - Description text\n- `error` - Error message\n\n\n\n## Component Documentation from components/card.md\n# Card Component\nSource: https://mantine.dev/core/card/\n\n## Import\n```tsx\nimport { Card, Image, Text, Badge, Button, Group } from '@mantine/core';\n```\n\n## Overview\nThe Card component is a wrapper around the Paper component with additional styling and the `Card.Section` component for dividing content into sections. For simpler use cases without sections, use the Paper component instead.\n\n## Basic Usage\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n  <Text>Card content</Text>\n</Card>\n```\n\n## Props\n\n| Prop | Type | Default | Description |\n|------|------|---------|-------------|\n| shadow | xs \\| sm \\| md \\| lg \\| xl | - | Card shadow depth |\n| padding | xs \\| sm \\| md \\| lg \\| xl | md | Inner padding |\n| radius | xs \\| sm \\| md \\| lg \\| xl | md | Border radius |\n| withBorder | boolean | false | Adds border to Card.Section elements based on position |\n\n## Card.Section Component\n\n`Card.Section` removes Card padding from its children while maintaining horizontal spacing from other elements.\n\n### Margin Behavior\n- **First child**: Negative top, left, and right margins\n- **Last child**: Negative bottom, left, and right margins\n- **Middle child**: Negative left and right margins only\n\n### Card.Section Props\n\n| Prop | Type | Description |\n|------|------|-------------|\n| inheritPadding | boolean | Applies same left/right padding as parent Card |\n| withBorder | boolean | Adds top/bottom borders depending on section position |\n| component | ElementType | Polymorphic prop to render as different element |\n\n```tsx\n// Inherit padding from card\n<Card.Section inheritPadding>\n  <Text>Padded section content</Text>\n</Card.Section>\n\n// Add border\n<Card.Section withBorder>\n  <Text>Bordered section content</Text>\n</Card.Section>\n\n// As link\n<Card.Section component=\"a\" href=\"#\">\n  Clickable section\n</Card.Section>\n```\n\n## Important Constraints\n\nCard relies on mapping direct children—you **cannot** wrap `Card.Section` elements in fragments or additional divs. This will prevent proper margin calculations.\n\n```tsx\n// ❌ WRONG - fragments break margin calculations\n<Card>\n  <>\n    <Card.Section>...</Card.Section>\n  </>\n</Card>\n\n// ✅ CORRECT - direct children\n<Card>\n  <Card.Section>...</Card.Section>\n  <Text>Content</Text>\n</Card>\n```\n\n## Common Patterns\n\n### Product Card\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n  <Card.Section>\n    <Image\n      src=\"https://example.com/product.jpg\"\n      height={180}\n      alt=\"Product name\"\n    />\n  </Card.Section>\n\n  <Group justify=\"space-between\" mt=\"md\" mb=\"xs\">\n    <Text fw={500}>Product Name</Text>\n    <Badge color=\"pink\">On Sale</Badge>\n  </Group>\n\n  <Text size=\"sm\" c=\"dimmed\">\n    Product description goes here with details about the item.\n  </Text>\n\n  <Button color=\"blue\" fullWidth mt=\"md\" radius=\"md\">\n    Buy Now\n  </Button>\n</Card>\n```\n\n### Feature Card\n```tsx\n<Card shadow=\"sm\" padding=\"xl\" radius=\"md\">\n  <ThemeIcon size={50} radius=\"md\" color=\"blue\" mb=\"md\">\n    <IconRocket size={26} />\n  </ThemeIcon>\n\n  <Text fw={500} size=\"lg\" mb=\"xs\">\n    Feature Title\n  </Text>\n\n  <Text size=\"sm\" c=\"dimmed\">\n    Feature description explaining the benefit.\n  </Text>\n</Card>\n```\n\n### Card as Link (Polymorphic)\n```tsx\n<Card\n  shadow=\"sm\"\n  padding=\"lg\"\n  radius=\"md\"\n  component=\"a\"\n  href=\"/details\"\n>\n  <Text>Click entire card to navigate</Text>\n</Card>\n```\n\n## Recommended Defaults\n\nFor most cards, use:\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n```\n\n\n\n## Component Documentation from components/button.md\n# Button Component\nSource: https://mantine.dev/core/button/\n\n## Import\n```tsx\nimport { Button } from '@mantine/core';\n```\n\n## Overview\nThe Button component renders interactive button or link elements with support for multiple variants, sizes, colors, and states.\n\n## Variants\n\n| Variant | Description | Code |\n|---------|-------------|------|\n| filled | Default solid button | `variant=\"filled\"` |\n| light | Lighter background | `variant=\"light\"` |\n| outline | Border only, no fill | `variant=\"outline\"` |\n| subtle | Minimal background | `variant=\"subtle\"` |\n| transparent | No background | `variant=\"transparent\"` |\n| white | White background | `variant=\"white\"` |\n| gradient | Gradient background | `variant=\"gradient\"` |\n\n## Sizes\n\n```tsx\n<Button size=\"xs\">Extra Small</Button>\n<Button size=\"sm\">Small</Button>\n<Button size=\"md\">Medium (default)</Button>\n<Button size=\"lg\">Large</Button>\n<Button size=\"xl\">Extra Large</Button>\n\n// Compact variants have reduced padding\n<Button size=\"compact-xs\">Compact XS</Button>\n<Button size=\"compact-sm\">Compact Small</Button>\n<Button size=\"compact-md\">Compact Medium</Button>\n<Button size=\"compact-lg\">Compact Large</Button>\n<Button size=\"compact-xl\">Compact XL</Button>\n```\n\n## Colors\n\nUses theme colors. Default is `blue`:\n```tsx\n<Button color=\"blue\">Primary (default)</Button>\n<Button color=\"green\">Success</Button>\n<Button color=\"red\">Danger</Button>\n<Button color=\"yellow\">Warning</Button>\n<Button color=\"gray\">Neutral</Button>\n```\n\n## Key Props\n\n| Prop | Type | Description |\n|------|------|-------------|\n| disabled | boolean | Prevents interactions and applies disabled styling |\n| loading | boolean | Shows loader overlay and disables interaction |\n| fullWidth | boolean | Expands to 100% parent width |\n| leftSection | ReactNode | Adds icon/element on left side |\n| rightSection | ReactNode | Adds icon/element on right side |\n| justify | string | Controls alignment of sections (e.g., `space-between`) |\n| component | ElementType | Polymorphic prop to render as different elements |\n| autoContrast | boolean | Adjusts text color for sufficient contrast with background |\n\n## States\n\n### Loading State\n```tsx\n<Button loading>Submitting...</Button>\n<Button loading loaderProps={{ type: 'dots' }}>\n  Custom loader\n</Button>\n```\n\n### Disabled State\n```tsx\n// Use disabled prop for true disabled buttons\n<Button disabled>Disabled Button</Button>\n\n// Use data-disabled for link elements or when needing Tooltip integration\n<Button data-disabled onClick={(e) => e.preventDefault()}>\n  Data Disabled\n</Button>\n```\n\n## Sections\n\nWhen a section is added, padding on the corresponding side is reduced. Sections flip automatically in RTL mode.\n\n```tsx\nimport { IconArrowRight, IconDownload } from '@tabler/icons-react';\n\n// Left section\n<Button leftSection={<IconDownload size={14} />}>\n  Download\n</Button>\n\n// Right section\n<Button rightSection={<IconArrowRight size={14} />}>\n  Continue\n</Button>\n\n// Spread sections across button width\n<Button\n  leftSection={<IconDownload size={14} />}\n  justify=\"space-between\"\n  fullWidth\n>\n  Download\n</Button>\n```\n\n## Gradient Variant\n\n```tsx\n<Button\n  variant=\"gradient\"\n  gradient={{ from: 'blue', to: 'cyan', deg: 90 }}\n>\n  Gradient Button\n</Button>\n```\n\n## Button.Group\n\nGroup multiple buttons together. Child buttons must be direct children (no wrapper elements):\n\n```tsx\n<Button.Group>\n  <Button variant=\"default\">First</Button>\n  <Button variant=\"default\">Second</Button>\n  <Button variant=\"default\">Third</Button>\n</Button.Group>\n\n// Vertical orientation\n<Button.Group orientation=\"vertical\">\n  <Button variant=\"default\">First</Button>\n  <Button variant=\"default\">Second</Button>\n</Button.Group>\n```\n\n## As Link (Polymorphic)\n\n```tsx\n// As anchor\n<Button component=\"a\" href=\"/page\">\n  Link Button\n</Button>\n\n// With Next.js Link\nimport Link from 'next/link';\n<Button component={Link} href=\"/page\">\n  Next.js Link\n</Button>\n```\n\n## Styles API\n\nTarget these elements with `classNames` prop:\n- `root` - Root button element\n- `loader` - Loader overlay\n- `inner` - Inner wrapper\n- `section` - Left/right section wrapper\n- `label` - Button text label\n\n\n🎨 DESIGN TOKENS:\n```json\n{\n  \"_source\": \"https://mantine.dev/theming/colors/\",\n  \"fontFamilies\": {\n    \"default\": \"-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji\",\n    \"monospace\": \"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace\",\n    \"themeProperties\": {\n      \"fontFamily\": \"Controls font for all components except Title, Code, and Kbd\",\n      \"fontFamilyMonospace\": \"For monospace-requiring components like Code, Kbd, and CodeHighlight\",\n      \"headings.fontFamily\": \"Specific to h1-h6 tags in Title and Typography components\"\n    }\n  },\n  \"fontSizes\": {\n    \"xs\": {\n      \"value\": \"0.75rem\",\n      \"pixels\": \"12px\",\n      \"usage\": \"size=\\\"xs\\\"\"\n    },\n    \"sm\": {\n      \"value\": \"0.875rem\",\n      \"pixels\": \"14px\",\n      \"usage\": \"size=\\\"sm\\\"\"\n    },\n    \"md\": {\n      \"value\": \"1rem\",\n      \"pixels\": \"16px\",\n      \"usage\": \"size=\\\"md\\\" (default)\"\n    },\n    \"lg\": {\n      \"value\": \"1.125rem\",\n      \"pixels\": \"18px\",\n      \"usage\": \"size=\\\"lg\\\"\"\n    },\n    \"xl\": {\n      \"value\": \"1.25rem\",\n      \"pixels\": \"20px\",\n      \"usage\": \"size=\\\"xl\\\"\"\n    }\n  },\n  \"lineHeights\": {\n    \"description\": \"Controls spacing between text lines, primarily for the Text component\",\n    \"xs\": 1.4,\n    \"sm\": 1.45,\n    \"md\": 1.55,\n    \"lg\": 1.6,\n    \"xl\": 1.65\n  },\n  \"fontWeights\": {\n    \"normal\": {\n      \"value\": 400,\n      \"usage\": \"fw={400}\"\n    },\n    \"medium\": {\n      \"value\": 500,\n      \"usage\": \"fw={500}\"\n    },\n    \"semibold\": {\n      \"value\": 600,\n      \"usage\": \"fw={600}\"\n    },\n    \"bold\": {\n      \"value\": 700,\n      \"usage\": \"fw={700}\"\n    }\n  },\n  \"textStyling\": {\n    \"italic\": \"fs=\\\"italic\\\"\",\n    \"underline\": \"td=\\\"underline\\\"\",\n    \"strikethrough\": \"td=\\\"line-through\\\"\",\n    \"uppercase\": \"tt=\\\"uppercase\\\"\",\n    \"capitalize\": \"tt=\\\"capitalize\\\"\"\n  },\n  \"textComponents\": {\n    \"Text\": {\n      \"description\": \"Primary text component, polymorphic with <p> as default\",\n      \"usage\": \"<Text size=\\\"sm\\\" c=\\\"dimmed\\\">Description text</Text>\"\n    },\n    \"Title\": {\n      \"description\": \"Heading component for h1-h6 tags\",\n      \"usage\": \"<Title order={2}>Section Title</Title>\",\n      \"orders\": {\n        \"1\": \"34px (h1)\",\n        \"2\": \"26px (h2)\",\n        \"3\": \"22px (h3)\",\n        \"4\": \"18px (h4)\",\n        \"5\": \"16px (h5)\",\n        \"6\": \"14px (h6)\"\n      }\n    },\n    \"Anchor\": {\n      \"description\": \"Link text component\",\n      \"usage\": \"<Anchor href=\\\"#\\\">Click here</Anchor>\"\n    },\n    \"Code\": {\n      \"description\": \"Inline code component\",\n      \"usage\": \"<Code>npm install</Code>\"\n    },\n    \"Highlight\": {\n      \"description\": \"Highlighted text\",\n      \"usage\": \"<Highlight highlight=\\\"important\\\">This is important text</Highlight>\"\n    }\n  },\n  \"truncation\": {\n    \"singleLine\": \"truncate=\\\"end\\\"\",\n    \"multiLine\": \"lineClamp={2}\",\n    \"description\": \"lineClamp uses CSS -webkit-line-clamp\"\n  },\n  \"scale\": {\n    \"xs\": \"0.625rem (10px)\",\n    \"sm\": \"0.75rem (12px)\",\n    \"md\": \"1rem (16px)\",\n    \"lg\": \"1.25rem (20px)\",\n    \"xl\": \"2rem (32px)\"\n  },\n  \"styleProps\": {\n    \"margin\": {\n      \"m\": \"margin (all sides)\",\n      \"mt\": \"margin-top\",\n      \"mb\": \"margin-bottom\",\n      \"ml\": \"margin-left\",\n      \"mr\": \"margin-right\",\n      \"ms\": \"margin-inline-start (RTL-aware)\",\n      \"me\": \"margin-inline-end (RTL-aware)\",\n      \"mx\": \"margin-left and margin-right\",\n      \"my\": \"margin-top and margin-bottom\"\n    },\n    \"padding\": {\n      \"p\": \"padding (all sides)\",\n      \"pt\": \"padding-top\",\n      \"pb\": \"padding-bottom\",\n      \"pl\": \"padding-left\",\n      \"pr\": \"padding-right\",\n      \"ps\": \"padding-inline-start (RTL-aware)\",\n      \"pe\": \"padding-inline-end (RTL-aware)\",\n      \"px\": \"padding-left and padding-right\",\n      \"py\": \"padding-top and padding-bottom\"\n    },\n    \"dimensions\": {\n      \"w\": \"width\",\n      \"miw\": \"min-width\",\n      \"maw\": \"max-width\",\n      \"h\": \"height\",\n      \"mih\": \"min-height\",\n      \"mah\": \"max-height\"\n    }\n  },\n  \"values\": {\n    \"themeTokens\": [\n      \"xs\",\n      \"sm\",\n      \"md\",\n      \"lg\",\n      \"xl\"\n    ],\n    \"customValues\": [\n      \"16\",\n      \"5rem\",\n      \"auto\",\n      \"100%\"\n    ]\n  },\n  \"responsive\": {\n    \"description\": \"Object syntax enables breakpoint-based responsiveness\",\n    \"example\": \"p={{ base: 'sm', sm: 'md', lg: 'xl' }}\",\n    \"breakpoints\": {\n      \"base\": \"default (no breakpoint)\",\n      \"xs\": \"36em (576px)\",\n      \"sm\": \"48em (768px)\",\n      \"md\": \"62em (992px)\",\n      \"lg\": \"75em (1200px)\",\n      \"xl\": \"88em (1408px)\"\n    }\n  },\n  \"layoutComponents\": {\n    \"Stack\": {\n      \"description\": \"Vertical flex container\",\n      \"gapProp\": \"gap=\\\"md\\\"\",\n      \"example\": \"<Stack gap=\\\"md\\\">{children}</Stack>\"\n    },\n    \"Group\": {\n      \"description\": \"Horizontal flex container\",\n      \"gapProp\": \"gap=\\\"sm\\\"\",\n      \"example\": \"<Group gap=\\\"sm\\\">{children}</Group>\"\n    },\n    \"Flex\": {\n      \"description\": \"Advanced flex control\",\n      \"example\": \"<Flex gap=\\\"md\\\" justify=\\\"space-between\\\" align=\\\"center\\\">\"\n    }\n  },\n  \"note\": \"Stack and Group use flexbox gap. Older browsers may need flex-gap-polyfill PostCSS plugin.\",\n  \"shadows\": {\n    \"xs\": \"Subtle shadow for slight elevation\",\n    \"sm\": \"Light shadow for cards (recommended default)\",\n    \"md\": \"Medium shadow for emphasis\",\n    \"lg\": \"Strong shadow for modals/popovers\",\n    \"xl\": \"Maximum elevation\"\n  },\n  \"radius\": {\n    \"xs\": \"0.125rem (2px)\",\n    \"sm\": \"0.25rem (4px)\",\n    \"md\": \"0.5rem (8px)\",\n    \"lg\": \"1rem (16px)\",\n    \"xl\": \"2rem (32px)\"\n  },\n  \"defaultRadius\": {\n    \"description\": \"Default border-radius used by most components\",\n    \"themeProperty\": \"theme.defaultRadius\",\n    \"default\": \"sm\"\n  },\n  \"usage\": {\n    \"shadow\": \"shadow=\\\"sm\\\"\",\n    \"radius\": \"radius=\\\"md\\\"\",\n    \"combined\": \"shadow=\\\"sm\\\" radius=\\\"md\\\"\"\n  },\n  \"recommendations\": {\n    \"cards\": \"shadow=\\\"sm\\\" radius=\\\"md\\\" withBorder\",\n    \"buttons\": \"radius=\\\"md\\\"\",\n    \"inputs\": \"radius=\\\"sm\\\"\",\n    \"modals\": \"shadow=\\\"xl\\\" radius=\\\"md\\\"\",\n    \"badges\": \"radius=\\\"xl\\\" (pill shape)\"\n  },\n  \"cssVariables\": {\n    \"shadow\": \"var(--mantine-shadow-sm)\",\n    \"radius\": \"var(--mantine-radius-md)\"\n  },\n  \"_description\": \"Mantine uses open-color as its foundation. Each color has 10 shades (0-9), where higher indices represent darker variations.\",\n  \"defaultColors\": [\n    \"dark\",\n    \"gray\",\n    \"red\",\n    \"pink\",\n    \"grape\",\n    \"violet\",\n    \"indigo\",\n    \"blue\",\n    \"cyan\",\n    \"teal\",\n    \"green\",\n    \"lime\",\n    \"yellow\",\n    \"orange\"\n  ],\n  \"colorShades\": {\n    \"description\": \"Each color requires at least 10 shades (indices 0-9)\",\n    \"usage\": {\n      \"byIndex\": \"theme.colors.blue[5]\",\n      \"dotNotation\": \"color=\\\"blue.5\\\"\",\n      \"cssVariable\": \"var(--mantine-color-red-5)\"\n    }\n  },\n  \"primaryColor\": {\n    \"description\": \"Set theme.primaryColor to any color key to establish default component colors\",\n    \"default\": \"blue\",\n    \"example\": \"theme.primaryColor = 'bright-pink'\"\n  },\n  \"primaryShade\": {\n    \"description\": \"Controls which shade (0-9) applies by default\",\n    \"default\": {\n      \"light\": 6,\n      \"dark\": 8\n    },\n    \"example\": \"theme.primaryShade = { light: 6, dark: 8 }\"\n  },\n  \"semanticColors\": {\n    \"success\": {\n      \"color\": \"green\",\n      \"usage\": \"color=\\\"green\\\"\"\n    },\n    \"warning\": {\n      \"color\": \"yellow\",\n      \"usage\": \"color=\\\"yellow\\\"\"\n    },\n    \"error\": {\n      \"color\": \"red\",\n      \"usage\": \"color=\\\"red\\\"\"\n    },\n    \"info\": {\n      \"color\": \"blue\",\n      \"usage\": \"color=\\\"blue\\\"\"\n    }\n  },\n  \"textColors\": {\n    \"default\": \"No color prop needed\",\n    \"dimmed\": \"c=\\\"dimmed\\\"\",\n    \"muted\": \"c=\\\"gray.6\\\"\"\n  },\n  \"virtualColors\": {\n    \"description\": \"Special colors that differ between light and dark modes using virtualColor function\",\n    \"example\": {\n      \"name\": \"primary\",\n      \"light\": \"cyan\",\n      \"dark\": \"pink\"\n    }\n  },\n  \"colorFunctions\": {\n    \"colorsTuple\": \"Converts single colors or arrays into Mantine color tuples\",\n    \"generateColors\": \"Creates 10-shade palettes from single hex values\"\n  },\n  \"supportedFormats\": [\n    \"HEX\",\n    \"RGB\",\n    \"HSL\",\n    \"OKLCH\"\n  ]\n}\n```\n\n\n📋 DESIGN PATTERNS:\n\n### hero-sections\n# Hero Section Patterns\nSource: https://mantine.dev/core/container/\n\n## Simple Hero\n\n```tsx\n<Container size=\"md\" py=\"xl\">\n  <Stack align=\"center\" gap=\"lg\">\n    <Title order={1} ta=\"center\">Welcome to Our Platform</Title>\n    <Text size=\"lg\" c=\"dimmed\" ta=\"center\" maw={600}>\n      Build amazing products with our powerful tools.\n    </Text>\n    <Group>\n      <Button size=\"lg\">Get Started</Button>\n      <Button size=\"lg\" variant=\"light\">Learn More</Button>\n    </Group>\n  </Stack>\n</Container>\n```\n\n## Hero with Split Layout\n\n```tsx\n<Container size=\"xl\" py=\"xl\">\n  <Grid gutter=\"xl\" align=\"center\">\n    <Grid.Col span={{ base: 12, md: 6 }}>\n      <Stack gap=\"lg\">\n        <Title order={1}>Build Better Products</Title>\n        <Text size=\"lg\" c=\"dimmed\">{description}</Text>\n        <Group>\n          <Button>Start Free Trial</Button>\n          <Button variant=\"outline\">Watch Demo</Button>\n        </Group>\n      </Stack>\n    </Grid.Col>\n    <Grid.Col span={{ base: 12, md: 6 }}>\n      <Image src={heroImage} alt=\"Hero\" radius=\"md\" />\n    </Grid.Col>\n  </Grid>\n</Container>\n```\n\n\n### forms\n# Form Patterns\nSource: https://mantine.dev/form/use-form/\n\n## Basic Form Layout\n\n```tsx\nimport { TextInput, Button, Stack } from '@mantine/core';\n\n<form onSubmit={handleSubmit}>\n  <Stack gap=\"md\">\n    <TextInput label=\"Email\" placeholder=\"your@email.com\" />\n    <TextInput label=\"Name\" placeholder=\"Your name\" />\n    <Button type=\"submit\">Submit</Button>\n  </Stack>\n</form>\n```\n\n## Form with Validation (useForm)\n\n```tsx\nimport { useForm } from '@mantine/form';\n\nconst form = useForm({\n  initialValues: { email: '', name: '' },\n  validate: {\n    email: (value) => (/^\\S+@\\S+$/.test(value) ? null : 'Invalid email'),\n  },\n});\n\n<form onSubmit={form.onSubmit(handleSubmit)}>\n  <TextInput\n    label=\"Email\"\n    {...form.getInputProps('email')}\n  />\n</form>\n```\n\n## Form in Card\n\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n  <Stack gap=\"md\">\n    <Title order={3}>Contact Us</Title>\n    <TextInput label=\"Email\" />\n    <Textarea label=\"Message\" />\n    <Button>Send</Button>\n  </Stack>\n</Card>\n```\n\n\n### cards\n# Card Patterns\nSource: https://mantine.dev/core/card/\n\n## Product Card\n\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n  <Card.Section>\n    <Image src={imageUrl} height={180} alt={productName} />\n  </Card.Section>\n\n  <Group justify=\"space-between\" mt=\"md\" mb=\"xs\">\n    <Text fw={500}>{productName}</Text>\n    <Badge color=\"pink\">On Sale</Badge>\n  </Group>\n\n  <Text size=\"sm\" c=\"dimmed\">{description}</Text>\n\n  <Button fullWidth mt=\"md\">Add to Cart</Button>\n</Card>\n```\n\n## Feature Card\n\n```tsx\n<Card shadow=\"sm\" padding=\"xl\" radius=\"md\">\n  <ThemeIcon size={50} radius=\"md\" color=\"blue\" mb=\"md\">\n    <IconStar size={26} />\n  </ThemeIcon>\n  <Text fw={500} size=\"lg\">{title}</Text>\n  <Text size=\"sm\" c=\"dimmed\" mt=\"xs\">{description}</Text>\n</Card>\n```\n\n## Card Grid\n\n```tsx\n<SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing=\"lg\">\n  <Card>Card 1</Card>\n  <Card>Card 2</Card>\n  <Card>Card 3</Card>\n</SimpleGrid>\n```\n\n\n\n📋 ADDITIONAL DESIGN SYSTEM RULES:\nLIBRARY: @mantine/core\n\nCORE PRINCIPLES:\n- Use only Mantine components from @mantine/core\n- Never use Material-UI, Chakra UI, or other design systems\n- Use Mantine's built-in props for styling (size, radius, color, variant)\n- Use Mantine's Grid, Group, Stack, and Container for layout\n- ALWAYS prioritize readability and color contrast\n\nAI INSTRUCTIONS:\n- ### Color Contrast Rules (MOST IMPORTANT)\n- /light backgrounds\n- - Use Mantine's color prop with appropriate contrast\n- - Example: Instead of \"Welcome to Dashboard\", use \"WELCOME TO DASHBOARD\"\n- `color=\"blue\"` (Mantine's default blue)\n- s good contrast and visibility\n- - Text inside cards should be dark (default) for readability\n- (`p=\"lg\"` or `p=\"xl\"`)\n- - use Mantine's responsive props\n- -UI, Chakra UI, or other design systems\n- ## Do's and Don'ts\n- - Use light backgrounds (white, gray.0, gray.1) for cards\n- - Never use colors that create poor contrast\n- , MuiTextField, or any Material-UI components\n- , span when Mantine equivalents exist\n- - Have all headings in UPPERCASE\n- **Wrong**: `<Title>Welcome</Title>`\n- **Wrong**: `<Text c=\"white\">content on light bg</Text>`\n- \"WELCOME TO DASHBOARD\"\n- `cols={{ base: 1, sm: 2, md: 3, lg: 4 }}`\n- -width responsive columns\n- , Group for horizontal layouts\n- `size=\"xl\"` or `fluid` for full-width layouts\n- `{{ base: 'value', sm: 'value', md: 'value', lg: 'value' }}`\n- `radius=\"md\"` or `radius=\"lg\"`\n- (varied `order` prop) and Text (with `size` prop)\n- , Indicator, and other decorative elements for visual interest\n- @mantine/core\n- 's built-in props for styling (size, radius, color, variant)\n- 's Grid, Group, Stack, and Container for layout\n- `color=\"blue\"` on ALL buttons\n- (white, gray.0, gray.1) for cards\n- - Use Mantine's Paper component for card-like containers\n- (with UPPERCASE text) and Text for body copy\n- - Never use white text on white/light backgrounds\n- - Have readable text with good contrast\n- **TEST_MARKER: BLUE_BUTTONS_UPPERCASE_HEADINGS_GOOD_CONTRAST**\n- **Wrong**: `<Button>Click Me</Button>`";
+
+export const hasConsiderations = true;
+
+export const designTokens = {
+  "_source": "https://mantine.dev/theming/colors/",
+  "fontFamilies": {
+    "default": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
+    "monospace": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
+    "themeProperties": {
+      "fontFamily": "Controls font for all components except Title, Code, and Kbd",
+      "fontFamilyMonospace": "For monospace-requiring components like Code, Kbd, and CodeHighlight",
+      "headings.fontFamily": "Specific to h1-h6 tags in Title and Typography components"
+    }
+  },
+  "fontSizes": {
+    "xs": {
+      "value": "0.75rem",
+      "pixels": "12px",
+      "usage": "size=\"xs\""
+    },
+    "sm": {
+      "value": "0.875rem",
+      "pixels": "14px",
+      "usage": "size=\"sm\""
+    },
+    "md": {
+      "value": "1rem",
+      "pixels": "16px",
+      "usage": "size=\"md\" (default)"
+    },
+    "lg": {
+      "value": "1.125rem",
+      "pixels": "18px",
+      "usage": "size=\"lg\""
+    },
+    "xl": {
+      "value": "1.25rem",
+      "pixels": "20px",
+      "usage": "size=\"xl\""
+    }
+  },
+  "lineHeights": {
+    "description": "Controls spacing between text lines, primarily for the Text component",
+    "xs": 1.4,
+    "sm": 1.45,
+    "md": 1.55,
+    "lg": 1.6,
+    "xl": 1.65
+  },
+  "fontWeights": {
+    "normal": {
+      "value": 400,
+      "usage": "fw={400}"
+    },
+    "medium": {
+      "value": 500,
+      "usage": "fw={500}"
+    },
+    "semibold": {
+      "value": 600,
+      "usage": "fw={600}"
+    },
+    "bold": {
+      "value": 700,
+      "usage": "fw={700}"
+    }
+  },
+  "textStyling": {
+    "italic": "fs=\"italic\"",
+    "underline": "td=\"underline\"",
+    "strikethrough": "td=\"line-through\"",
+    "uppercase": "tt=\"uppercase\"",
+    "capitalize": "tt=\"capitalize\""
+  },
+  "textComponents": {
+    "Text": {
+      "description": "Primary text component, polymorphic with <p> as default",
+      "usage": "<Text size=\"sm\" c=\"dimmed\">Description text</Text>"
+    },
+    "Title": {
+      "description": "Heading component for h1-h6 tags",
+      "usage": "<Title order={2}>Section Title</Title>",
+      "orders": {
+        "1": "34px (h1)",
+        "2": "26px (h2)",
+        "3": "22px (h3)",
+        "4": "18px (h4)",
+        "5": "16px (h5)",
+        "6": "14px (h6)"
+      }
+    },
+    "Anchor": {
+      "description": "Link text component",
+      "usage": "<Anchor href=\"#\">Click here</Anchor>"
+    },
+    "Code": {
+      "description": "Inline code component",
+      "usage": "<Code>npm install</Code>"
+    },
+    "Highlight": {
+      "description": "Highlighted text",
+      "usage": "<Highlight highlight=\"important\">This is important text</Highlight>"
+    }
+  },
+  "truncation": {
+    "singleLine": "truncate=\"end\"",
+    "multiLine": "lineClamp={2}",
+    "description": "lineClamp uses CSS -webkit-line-clamp"
+  },
+  "scale": {
+    "xs": "0.625rem (10px)",
+    "sm": "0.75rem (12px)",
+    "md": "1rem (16px)",
+    "lg": "1.25rem (20px)",
+    "xl": "2rem (32px)"
+  },
+  "styleProps": {
+    "margin": {
+      "m": "margin (all sides)",
+      "mt": "margin-top",
+      "mb": "margin-bottom",
+      "ml": "margin-left",
+      "mr": "margin-right",
+      "ms": "margin-inline-start (RTL-aware)",
+      "me": "margin-inline-end (RTL-aware)",
+      "mx": "margin-left and margin-right",
+      "my": "margin-top and margin-bottom"
+    },
+    "padding": {
+      "p": "padding (all sides)",
+      "pt": "padding-top",
+      "pb": "padding-bottom",
+      "pl": "padding-left",
+      "pr": "padding-right",
+      "ps": "padding-inline-start (RTL-aware)",
+      "pe": "padding-inline-end (RTL-aware)",
+      "px": "padding-left and padding-right",
+      "py": "padding-top and padding-bottom"
+    },
+    "dimensions": {
+      "w": "width",
+      "miw": "min-width",
+      "maw": "max-width",
+      "h": "height",
+      "mih": "min-height",
+      "mah": "max-height"
+    }
+  },
+  "values": {
+    "themeTokens": [
+      "xs",
+      "sm",
+      "md",
+      "lg",
+      "xl"
+    ],
+    "customValues": [
+      "16",
+      "5rem",
+      "auto",
+      "100%"
+    ]
+  },
+  "responsive": {
+    "description": "Object syntax enables breakpoint-based responsiveness",
+    "example": "p={{ base: 'sm', sm: 'md', lg: 'xl' }}",
+    "breakpoints": {
+      "base": "default (no breakpoint)",
+      "xs": "36em (576px)",
+      "sm": "48em (768px)",
+      "md": "62em (992px)",
+      "lg": "75em (1200px)",
+      "xl": "88em (1408px)"
+    }
+  },
+  "layoutComponents": {
+    "Stack": {
+      "description": "Vertical flex container",
+      "gapProp": "gap=\"md\"",
+      "example": "<Stack gap=\"md\">{children}</Stack>"
+    },
+    "Group": {
+      "description": "Horizontal flex container",
+      "gapProp": "gap=\"sm\"",
+      "example": "<Group gap=\"sm\">{children}</Group>"
+    },
+    "Flex": {
+      "description": "Advanced flex control",
+      "example": "<Flex gap=\"md\" justify=\"space-between\" align=\"center\">"
+    }
+  },
+  "note": "Stack and Group use flexbox gap. Older browsers may need flex-gap-polyfill PostCSS plugin.",
+  "shadows": {
+    "xs": "Subtle shadow for slight elevation",
+    "sm": "Light shadow for cards (recommended default)",
+    "md": "Medium shadow for emphasis",
+    "lg": "Strong shadow for modals/popovers",
+    "xl": "Maximum elevation"
+  },
+  "radius": {
+    "xs": "0.125rem (2px)",
+    "sm": "0.25rem (4px)",
+    "md": "0.5rem (8px)",
+    "lg": "1rem (16px)",
+    "xl": "2rem (32px)"
+  },
+  "defaultRadius": {
+    "description": "Default border-radius used by most components",
+    "themeProperty": "theme.defaultRadius",
+    "default": "sm"
+  },
+  "usage": {
+    "shadow": "shadow=\"sm\"",
+    "radius": "radius=\"md\"",
+    "combined": "shadow=\"sm\" radius=\"md\""
+  },
+  "recommendations": {
+    "cards": "shadow=\"sm\" radius=\"md\" withBorder",
+    "buttons": "radius=\"md\"",
+    "inputs": "radius=\"sm\"",
+    "modals": "shadow=\"xl\" radius=\"md\"",
+    "badges": "radius=\"xl\" (pill shape)"
+  },
+  "cssVariables": {
+    "shadow": "var(--mantine-shadow-sm)",
+    "radius": "var(--mantine-radius-md)"
+  },
+  "_description": "Mantine uses open-color as its foundation. Each color has 10 shades (0-9), where higher indices represent darker variations.",
+  "defaultColors": [
+    "dark",
+    "gray",
+    "red",
+    "pink",
+    "grape",
+    "violet",
+    "indigo",
+    "blue",
+    "cyan",
+    "teal",
+    "green",
+    "lime",
+    "yellow",
+    "orange"
+  ],
+  "colorShades": {
+    "description": "Each color requires at least 10 shades (indices 0-9)",
+    "usage": {
+      "byIndex": "theme.colors.blue[5]",
+      "dotNotation": "color=\"blue.5\"",
+      "cssVariable": "var(--mantine-color-red-5)"
+    }
+  },
+  "primaryColor": {
+    "description": "Set theme.primaryColor to any color key to establish default component colors",
+    "default": "blue",
+    "example": "theme.primaryColor = 'bright-pink'"
+  },
+  "primaryShade": {
+    "description": "Controls which shade (0-9) applies by default",
+    "default": {
+      "light": 6,
+      "dark": 8
+    },
+    "example": "theme.primaryShade = { light: 6, dark: 8 }"
+  },
+  "semanticColors": {
+    "success": {
+      "color": "green",
+      "usage": "color=\"green\""
+    },
+    "warning": {
+      "color": "yellow",
+      "usage": "color=\"yellow\""
+    },
+    "error": {
+      "color": "red",
+      "usage": "color=\"red\""
+    },
+    "info": {
+      "color": "blue",
+      "usage": "color=\"blue\""
+    }
+  },
+  "textColors": {
+    "default": "No color prop needed",
+    "dimmed": "c=\"dimmed\"",
+    "muted": "c=\"gray.6\""
+  },
+  "virtualColors": {
+    "description": "Special colors that differ between light and dark modes using virtualColor function",
+    "example": {
+      "name": "primary",
+      "light": "cyan",
+      "dark": "pink"
+    }
+  },
+  "colorFunctions": {
+    "colorsTuple": "Converts single colors or arrays into Mantine color tuples",
+    "generateColors": "Creates 10-shade palettes from single hex values"
+  },
+  "supportedFormats": [
+    "HEX",
+    "RGB",
+    "HSL",
+    "OKLCH"
+  ]
+};
+
+export const designPatterns = {
+  "hero-sections": "# Hero Section Patterns\nSource: https://mantine.dev/core/container/\n\n## Simple Hero\n\n```tsx\n<Container size=\"md\" py=\"xl\">\n  <Stack align=\"center\" gap=\"lg\">\n    <Title order={1} ta=\"center\">Welcome to Our Platform</Title>\n    <Text size=\"lg\" c=\"dimmed\" ta=\"center\" maw={600}>\n      Build amazing products with our powerful tools.\n    </Text>\n    <Group>\n      <Button size=\"lg\">Get Started</Button>\n      <Button size=\"lg\" variant=\"light\">Learn More</Button>\n    </Group>\n  </Stack>\n</Container>\n```\n\n## Hero with Split Layout\n\n```tsx\n<Container size=\"xl\" py=\"xl\">\n  <Grid gutter=\"xl\" align=\"center\">\n    <Grid.Col span={{ base: 12, md: 6 }}>\n      <Stack gap=\"lg\">\n        <Title order={1}>Build Better Products</Title>\n        <Text size=\"lg\" c=\"dimmed\">{description}</Text>\n        <Group>\n          <Button>Start Free Trial</Button>\n          <Button variant=\"outline\">Watch Demo</Button>\n        </Group>\n      </Stack>\n    </Grid.Col>\n    <Grid.Col span={{ base: 12, md: 6 }}>\n      <Image src={heroImage} alt=\"Hero\" radius=\"md\" />\n    </Grid.Col>\n  </Grid>\n</Container>\n```\n",
+  "forms": "# Form Patterns\nSource: https://mantine.dev/form/use-form/\n\n## Basic Form Layout\n\n```tsx\nimport { TextInput, Button, Stack } from '@mantine/core';\n\n<form onSubmit={handleSubmit}>\n  <Stack gap=\"md\">\n    <TextInput label=\"Email\" placeholder=\"your@email.com\" />\n    <TextInput label=\"Name\" placeholder=\"Your name\" />\n    <Button type=\"submit\">Submit</Button>\n  </Stack>\n</form>\n```\n\n## Form with Validation (useForm)\n\n```tsx\nimport { useForm } from '@mantine/form';\n\nconst form = useForm({\n  initialValues: { email: '', name: '' },\n  validate: {\n    email: (value) => (/^\\S+@\\S+$/.test(value) ? null : 'Invalid email'),\n  },\n});\n\n<form onSubmit={form.onSubmit(handleSubmit)}>\n  <TextInput\n    label=\"Email\"\n    {...form.getInputProps('email')}\n  />\n</form>\n```\n\n## Form in Card\n\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n  <Stack gap=\"md\">\n    <Title order={3}>Contact Us</Title>\n    <TextInput label=\"Email\" />\n    <Textarea label=\"Message\" />\n    <Button>Send</Button>\n  </Stack>\n</Card>\n```\n",
+  "cards": "# Card Patterns\nSource: https://mantine.dev/core/card/\n\n## Product Card\n\n```tsx\n<Card shadow=\"sm\" padding=\"lg\" radius=\"md\" withBorder>\n  <Card.Section>\n    <Image src={imageUrl} height={180} alt={productName} />\n  </Card.Section>\n\n  <Group justify=\"space-between\" mt=\"md\" mb=\"xs\">\n    <Text fw={500}>{productName}</Text>\n    <Badge color=\"pink\">On Sale</Badge>\n  </Group>\n\n  <Text size=\"sm\" c=\"dimmed\">{description}</Text>\n\n  <Button fullWidth mt=\"md\">Add to Cart</Button>\n</Card>\n```\n\n## Feature Card\n\n```tsx\n<Card shadow=\"sm\" padding=\"xl\" radius=\"md\">\n  <ThemeIcon size={50} radius=\"md\" color=\"blue\" mb=\"md\">\n    <IconStar size={26} />\n  </ThemeIcon>\n  <Text fw={500} size=\"lg\">{title}</Text>\n  <Text size=\"sm\" c=\"dimmed\" mt=\"xs\">{description}</Text>\n</Card>\n```\n\n## Card Grid\n\n```tsx\n<SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing=\"lg\">\n  <Card>Card 1</Card>\n  <Card>Card 2</Card>\n  <Card>Card 3</Card>\n</SimpleGrid>\n```\n"
+};
+
+export const documentationSource = {
+  hasFullDocs: true,
+  hasLegacyConsiderations: true,
+  libraryName: "@mantine/core"
+};

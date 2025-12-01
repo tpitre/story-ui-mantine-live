@@ -1,0 +1,44 @@
+{
+  "_source": "https://mantine.dev/theming/theme-object/",
+
+  "shadows": {
+    "xs": "Subtle shadow for slight elevation",
+    "sm": "Light shadow for cards (recommended default)",
+    "md": "Medium shadow for emphasis",
+    "lg": "Strong shadow for modals/popovers",
+    "xl": "Maximum elevation"
+  },
+
+  "radius": {
+    "xs": "0.125rem (2px)",
+    "sm": "0.25rem (4px)",
+    "md": "0.5rem (8px)",
+    "lg": "1rem (16px)",
+    "xl": "2rem (32px)"
+  },
+
+  "defaultRadius": {
+    "description": "Default border-radius used by most components",
+    "themeProperty": "theme.defaultRadius",
+    "default": "sm"
+  },
+
+  "usage": {
+    "shadow": "shadow=\"sm\"",
+    "radius": "radius=\"md\"",
+    "combined": "shadow=\"sm\" radius=\"md\""
+  },
+
+  "recommendations": {
+    "cards": "shadow=\"sm\" radius=\"md\" withBorder",
+    "buttons": "radius=\"md\"",
+    "inputs": "radius=\"sm\"",
+    "modals": "shadow=\"xl\" radius=\"md\"",
+    "badges": "radius=\"xl\" (pill shape)"
+  },
+
+  "cssVariables": {
+    "shadow": "var(--mantine-shadow-sm)",
+    "radius": "var(--mantine-radius-md)"
+  }
+}

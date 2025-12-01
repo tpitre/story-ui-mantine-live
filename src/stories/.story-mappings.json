@@ -1,0 +1,227 @@
+[
+  {
+    "title": "Button Collection",
+    "fileName": "button-collection-ad8caa81.stories.tsx",
+    "storyId": "story-ad8caa81",
+    "hash": "ad8caa81",
+    "createdAt": "2025-08-22T04:06:07.028Z",
+    "updatedAt": "2025-08-22T04:06:07.028Z",
+    "prompt": "Show me a bunch of buttons "
+  },
+  {
+    "title": "Hamptons Lifestyle Editor's Picks",
+    "fileName": "story-ea3cc942",
+    "storyId": "story-ea3cc942",
+    "hash": "ea3cc942",
+    "createdAt": "2025-08-22T12:30:11.580Z",
+    "updatedAt": "2025-08-22T12:31:13.893Z",
+    "prompt": "It looks like it used a component that doesn't exist called card-section. Can you please update this? "
+  },
+  {
+    "title": "Children's Clothing Inventory Dashboard",
+    "fileName": "children-s-clothing-inventory-dashboard-c78a696f.stories.tsx",
+    "storyId": "story-c78a696f",
+    "hash": "c78a696f",
+    "createdAt": "2025-08-22T12:32:12.842Z",
+    "updatedAt": "2025-08-22T12:32:12.842Z",
+    "prompt": "Please create a lightweight inventory dashboard for a children's clothing store e-commerce website. "
+  },
+  {
+    "title": "Food Author Profile Section",
+    "fileName": "food-author-profile-section-ca0e5403.stories.tsx",
+    "storyId": "story-ca0e5403",
+    "hash": "ca0e5403",
+    "createdAt": "2025-08-22T12:34:26.124Z",
+    "updatedAt": "2025-08-22T12:34:26.124Z",
+    "prompt": "Generate a profile section for an author of a food publication website. "
+  },
+  {
+    "title": "Electronics Clothing Store Inventory Dashboard",
+    "fileName": "electronics-clothing-store-inventory-dashboard-1861d1f0.stories.tsx",
+    "storyId": "story-1861d1f0",
+    "hash": "1861d1f0",
+    "createdAt": "2025-08-22T12:35:27.500Z",
+    "updatedAt": "2025-08-22T12:35:27.500Z",
+    "prompt": "Please create a lightweight inventory dashboard for a electronics clothing store e-commerce website."
+  },
+  {
+    "title": "Eco-Friendly Energy Services CTA",
+    "fileName": "eco-friendly-energy-services-cta-a916b9f3.stories.tsx",
+    "storyId": "story-a916b9f3",
+    "hash": "a916b9f3",
+    "createdAt": "2025-08-22T13:18:46.603Z",
+    "updatedAt": "2025-08-22T13:18:46.603Z",
+    "prompt": "Build a call to action section for a marketing site promoting various eco-friendly service energy options. "
+  },
+  {
+    "title": "Recipe Card",
+    "fileName": "recipe-card-a4e6603b.stories.tsx",
+    "storyId": "story-a4e6603b",
+    "hash": "a4e6603b",
+    "createdAt": "2025-08-22T14:23:25.613Z",
+    "updatedAt": "2025-08-22T14:23:25.613Z",
+    "prompt": "A recipe card component. "
+  },
+  {
+    "title": "Outdoor Magazine Featured Article Card",
+    "fileName": "outdoor-magazine-featured-article-card-c2d4fda1.stories.tsx",
+    "storyId": "story-c2d4fda1",
+    "hash": "c2d4fda1",
+    "createdAt": "2025-08-23T16:24:47.733Z",
+    "updatedAt": "2025-08-23T16:24:47.733Z",
+    "prompt": "Generate an article featured card for an outdoor digital publication magazine. "
+  },
+  {
+    "title": "Basic Card",
+    "fileName": "basic-card-781ccd01.stories.tsx",
+    "storyId": "story-781ccd01",
+    "hash": "781ccd01",
+    "createdAt": "2025-08-23T23:17:12.867Z",
+    "updatedAt": "2025-08-23T23:17:12.867Z",
+    "prompt": "Generate a basic card. "
+  },
+  {
+    "title": "Basic Card with Image",
+    "fileName": "basic-card-with-image-09e3a27d.stories.tsx",
+    "storyId": "story-09e3a27d",
+    "hash": "09e3a27d",
+    "createdAt": "2025-08-23T23:32:23.030Z",
+    "updatedAt": "2025-08-24T03:01:01.612Z",
+    "prompt": "Generate a basic card with an image. "
+  },
+  {
+    "title": "Eco-Friendly Plumbing Hero",
+    "fileName": "eco-friendly-plumbing-hero-0aabbd4a.stories.tsx",
+    "storyId": "story-0aabbd4a",
+    "hash": "0aabbd4a",
+    "createdAt": "2025-08-24T12:07:54.457Z",
+    "updatedAt": "2025-08-24T12:07:54.457Z",
+    "prompt": "Generate a standard website hero for an eco-friendly local plumbing company. "
+  },
+  {
+    "title": "Two-Column Bluetooth Headphones Cards",
+    "fileName": "two-column-bluetooth-headphones-cards-9168504c.stories.tsx",
+    "storyId": "story-9168504c",
+    "hash": "9168504c",
+    "createdAt": "2025-08-24T12:26:12.569Z",
+    "updatedAt": "2025-08-24T12:26:12.569Z",
+    "prompt": "Generate a two-column layout where each column has a featured product card promoting Bluetooth headphones. "
+  },
+  {
+    "title": "Simple Mantine Card with Title and Text",
+    "fileName": "simple-mantine-card-with-title-and-text-cb3d06e6.stories.tsx",
+    "storyId": "story-cb3d06e6",
+    "hash": "cb3d06e6",
+    "createdAt": "2025-11-26T18:53:05.103Z",
+    "updatedAt": "2025-11-26T18:53:05.103Z",
+    "prompt": "Create a simple Mantine Card with title and text"
+  },
+  {
+    "title": "Mantine UI Component",
+    "fileName": "mantine-ui-component-b82da1ab.stories.tsx",
+    "storyId": "story-b82da1ab",
+    "hash": "b82da1ab",
+    "createdAt": "2025-11-26T19:01:41.434Z",
+    "updatedAt": "2025-11-26T19:01:41.434Z",
+    "prompt": "Create a Mantine component based on the UI shown in this image"
+  },
+  {
+    "title": "Basic Button",
+    "fileName": "basic-button-f9ceabdc.stories.tsx",
+    "storyId": "story-f9ceabdc",
+    "hash": "f9ceabdc",
+    "createdAt": "2025-11-26T19:02:21.869Z",
+    "updatedAt": "2025-11-26T19:02:21.869Z",
+    "prompt": "Generate a simple button"
+  },
+  {
+    "title": "Pricing Card - Three Tiers",
+    "fileName": "pricing-card-three-tiers-1e0eb3fd.stories.tsx",
+    "storyId": "story-1e0eb3fd",
+    "hash": "1e0eb3fd",
+    "createdAt": "2025-11-26T19:43:49.122Z",
+    "updatedAt": "2025-11-26T19:43:49.122Z",
+    "prompt": "Create a modern pricing card with three tiers: Basic, Pro, and Enterprise. Include pricing, feature lists, and CTA buttons using Mantine components."
+  },
+  {
+    "title": "Kanban Project Board with Draggable Cards",
+    "fileName": "kanban-project-board-with-draggable-cards-3adf1d93.stories.tsx",
+    "storyId": "story-3adf1d93",
+    "hash": "3adf1d93",
+    "createdAt": "2025-11-27T11:36:07.908Z",
+    "updatedAt": "2025-11-27T11:36:07.908Z",
+    "prompt": "Build a Kanban-style project board with three columns: To Do, In Progress, and Done. Each column should have 2-3 draggable task cards with title, description, assignee avatar, and priority badges."
+  },
+  {
+    "title": "Simple Card with Action Button",
+    "fileName": "simple-card-with-action-button-3165a04e.stories.tsx",
+    "storyId": "story-3165a04e",
+    "hash": "3165a04e",
+    "createdAt": "2025-11-27T11:49:55.675Z",
+    "updatedAt": "2025-11-27T11:49:55.675Z",
+    "prompt": "Create a simple card component with a title, description, and action button"
+  },
+  {
+    "title": "Product Card with Cart Button",
+    "fileName": "product-card-with-cart-button-4d586b06.stories.tsx",
+    "storyId": "story-4d586b06",
+    "hash": "4d586b06",
+    "createdAt": "2025-11-27T14:22:49.009Z",
+    "updatedAt": "2025-11-27T14:23:47.474Z",
+    "prompt": "Create a product card with image, title, price badge, description text, and add to cart button"
+  },
+  {
+    "title": "Login Form - Email and Password",
+    "fileName": "login-form-email-and-password-34d56fe4.stories.tsx",
+    "storyId": "story-34d56fe4",
+    "hash": "34d56fe4",
+    "createdAt": "2025-11-28T19:14:46.141Z",
+    "updatedAt": "2025-11-28T19:14:46.141Z",
+    "prompt": "Create a simple login form with email and password fields and a submit button"
+  },
+  {
+    "title": "Login with Remember Me Checkbox",
+    "fileName": "login-with-remember-me-checkbox-30b35cce.stories.tsx",
+    "storyId": "story-30b35cce",
+    "hash": "30b35cce",
+    "createdAt": "2025-11-28T19:15:55.359Z",
+    "updatedAt": "2025-11-28T19:15:55.359Z",
+    "prompt": "Add a remember me checkbox below the password field"
+  },
+  {
+    "title": "Mantine Button - Multiple Variants",
+    "fileName": "mantine-button-multiple-variants-2cbf073c.stories.tsx",
+    "storyId": "story-2cbf073c",
+    "hash": "2cbf073c",
+    "createdAt": "2025-11-28T20:51:23.104Z",
+    "updatedAt": "2025-11-28T20:51:23.104Z",
+    "prompt": "Create a simple Mantine Button with multiple variants"
+  },
+  {
+    "title": "Button with Text Children",
+    "fileName": "button-with-text-children-b9d47e64.stories.tsx",
+    "storyId": "story-b9d47e64",
+    "hash": "b9d47e64",
+    "createdAt": "2025-11-28T20:54:29.239Z",
+    "updatedAt": "2025-11-28T20:54:29.239Z",
+    "prompt": "Create a Mantine Button with text content to test children property"
+  },
+  {
+    "title": "Dashboard with Welcome Heading and Buttons",
+    "fileName": "story-68ee4414",
+    "storyId": "story-68ee4414",
+    "hash": "68ee4414",
+    "createdAt": "2025-11-29T04:53:25.207Z",
+    "updatedAt": "2025-11-29T21:15:29.878Z",
+    "prompt": "Create a pricing card"
+  },
+  {
+    "title": "Two Buttons",
+    "fileName": "two-buttons-32614a3a.stories.tsx",
+    "storyId": "story-32614a3a",
+    "hash": "32614a3a",
+    "createdAt": "2025-11-29T14:51:55.351Z",
+    "updatedAt": "2025-11-29T14:51:55.351Z",
+    "prompt": "Show me two buttons."
+  }
+]

@@ -1,0 +1,14 @@
+<!--
+  Story UI Manager Head Configuration
+
+  This file injects content into the Storybook manager's <head> element.
+  We use it to set the STORY_UI_EDGE_URL global that the manager addon reads.
+
+  For production deployments (Cloudflare Pages, Vercel, etc.), this should be
+  configured via environment variables at build time.
+-->
+<script>
+  // Set the Story UI Edge URL for the manager addon
+  // This value is replaced during the build process from VITE_STORY_UI_EDGE_URL env var
+  window.STORY_UI_EDGE_URL = '__STORY_UI_EDGE_URL__';
+</script>

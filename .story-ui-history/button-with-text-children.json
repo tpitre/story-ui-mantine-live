@@ -1,0 +1,14 @@
+{
+  "storyId": "button-with-text-children",
+  "title": "Button With Text Children",
+  "versions": [
+    {
+      "id": "84fb48d262cf9d53",
+      "timestamp": 1764363269240,
+      "prompt": "Create a Mantine Button with text content to test children property",
+      "code": "import React from 'react';\nimport type { Meta, StoryObj } from '@storybook/react';\nimport { Button } from '@mantine/core';\n\nconst meta = {\n  title: 'Generated/Button with Text Children',\n  component: Button,\n  parameters: {\n    layout: 'centered',\n  },\n  tags: ['autodocs'],\n} satisfies Meta<typeof Button>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const TextContent: Story = {\n  args: {\n    children: 'Click Me',\n  },\n};\n\nexport const LongTextContent: Story = {\n  args: {\n    children: 'This is a button with longer text content',\n  },\n};\n\nexport const WithVariants: Story = {\n  render: () => (\n    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>\n      <Button variant=\"filled\">Filled Button</Button>\n      <Button variant=\"light\">Light Button</Button>\n      <Button variant=\"outline\">Outline Button</Button>\n      <Button variant=\"subtle\">Subtle Button</Button>\n      <Button variant=\"transparent\">Transparent Button</Button>\n    </div>\n  ),\n};\n\nexport const WithSizes: Story = {\n  render: () => (\n    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>\n      <Button size=\"xs\">Extra Small</Button>\n      <Button size=\"sm\">Small</Button>\n      <Button size=\"md\">Medium</Button>\n      <Button size=\"lg\">Large</Button>\n      <Button size=\"xl\">Extra Large</Button>\n    </div>\n  ),\n};\n\nexport const WithColors: Story = {\n  render: () => (\n    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>\n      <Button color=\"blue\">Blue</Button>\n      <Button color=\"green\">Green</Button>\n      <Button color=\"red\">Red</Button>\n      <Button color=\"yellow\">Yellow</Button>\n      <Button color=\"gray\">Gray</Button>\n    </div>\n  ),\n};\n\nexport const MultipleChildren: Story = {\n  render: () => (\n    <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column', alignItems: 'flex-start' }}>\n      <Button>Simple text child</Button>\n      <Button>\n        Button with multiple words in children\n      </Button>\n      <Button fullWidth>Full Width Button</Button>\n    </div>\n  ),\n};",
+      "fileName": "button-with-text-children-b9d47e64.stories.tsx"
+    }
+  ],
+  "currentVersionId": "84fb48d262cf9d53"
+}

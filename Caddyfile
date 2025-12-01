@@ -1,0 +1,11 @@
+:80 {
+    # Route /mcp requests to the Story UI MCP server
+    handle /mcp* {
+        reverse_proxy localhost:4005
+    }
+
+    # Everything else goes to Storybook
+    handle {
+        reverse_proxy localhost:6006
+    }
+}

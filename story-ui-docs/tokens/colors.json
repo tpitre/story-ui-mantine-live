@@ -1,0 +1,60 @@
+{
+  "_source": "https://mantine.dev/theming/colors/",
+  "_description": "Mantine uses open-color as its foundation. Each color has 10 shades (0-9), where higher indices represent darker variations.",
+
+  "defaultColors": [
+    "dark", "gray", "red", "pink", "grape", "violet",
+    "indigo", "blue", "cyan", "teal", "green", "lime",
+    "yellow", "orange"
+  ],
+
+  "colorShades": {
+    "description": "Each color requires at least 10 shades (indices 0-9)",
+    "usage": {
+      "byIndex": "theme.colors.blue[5]",
+      "dotNotation": "color=\"blue.5\"",
+      "cssVariable": "var(--mantine-color-red-5)"
+    }
+  },
+
+  "primaryColor": {
+    "description": "Set theme.primaryColor to any color key to establish default component colors",
+    "default": "blue",
+    "example": "theme.primaryColor = 'bright-pink'"
+  },
+
+  "primaryShade": {
+    "description": "Controls which shade (0-9) applies by default",
+    "default": { "light": 6, "dark": 8 },
+    "example": "theme.primaryShade = { light: 6, dark: 8 }"
+  },
+
+  "semanticColors": {
+    "success": { "color": "green", "usage": "color=\"green\"" },
+    "warning": { "color": "yellow", "usage": "color=\"yellow\"" },
+    "error": { "color": "red", "usage": "color=\"red\"" },
+    "info": { "color": "blue", "usage": "color=\"blue\"" }
+  },
+
+  "textColors": {
+    "default": "No color prop needed",
+    "dimmed": "c=\"dimmed\"",
+    "muted": "c=\"gray.6\""
+  },
+
+  "virtualColors": {
+    "description": "Special colors that differ between light and dark modes using virtualColor function",
+    "example": {
+      "name": "primary",
+      "light": "cyan",
+      "dark": "pink"
+    }
+  },
+
+  "colorFunctions": {
+    "colorsTuple": "Converts single colors or arrays into Mantine color tuples",
+    "generateColors": "Creates 10-shade palettes from single hex values"
+  },
+
+  "supportedFormats": ["HEX", "RGB", "HSL", "OKLCH"]
+}

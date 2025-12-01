@@ -1,0 +1,14 @@
+{
+  "storyId": "dashboard-with-welcome-heading-and-buttons",
+  "title": "Dashboard With Welcome Heading And Buttons",
+  "versions": [
+    {
+      "id": "c3cf4bc14dd1d49a",
+      "timestamp": 1764392005207,
+      "prompt": "Create a simple dashboard with a heading that says Welcome and two buttons: Submit and Cancel",
+      "code": "import React from 'react';\nimport type { Meta, StoryObj } from '@storybook/react';\nimport { Title, Button, Group, Container } from '@mantine/core';\n\nconst meta = {\n  title: 'Generated/Dashboard with Welcome Heading and Buttons',\n  parameters: {\n    layout: 'centered',\n  },\n} satisfies Meta;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Default: Story = {\n  render: () => (\n    <Container size=\"md\" p=\"xl\" style={{ fontFamily: 'Comic Sans MS, cursive' }}>\n      <Title order={1} ta=\"center\" mb=\"xl\" tt=\"uppercase\">\n        WELCOME\n      </Title>\n      <Group justify=\"center\" gap=\"md\">\n        <Button color=\"grape\" size=\"lg\">\n          Submit\n        </Button>\n        <Button color=\"grape\" size=\"lg\" variant=\"outline\">\n          Cancel\n        </Button>\n      </Group>\n    </Container>\n  ),\n};",
+      "fileName": "dashboard-with-welcome-heading-and-buttons-68ee4414.stories.tsx"
+    }
+  ],
+  "currentVersionId": "c3cf4bc14dd1d49a"
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Builder Style Fix Test</title>
+</head>
+<body>
+    <h1>Visual Builder Style Fix Test</h1>
+    <p>Test the Visual Builder with the style parsing fix:</p>
+    
+    <h2>Steps to Test:</h2>
+    <ol>
+        <li>Navigate to a generated story in Storybook (e.g., <a href="http://localhost:6006/?path=/story/generated-eco-friendly-energy-services-cta-a916b9f3--default" target="_blank">Eco-Friendly Energy Services CTA</a>)</li>
+        <li>Click the "🎨 Edit in Visual Builder ↗" button in the upper-right corner</li>
+        <li>Visual Builder should open in a new tab without errors</li>
+        <li>Check the browser console for debugging output:
+            <ul>
+                <li>🎨 Parsing style: Shows style object parsing</li>
+                <li>✅ Successfully parsed style object: Confirms successful parsing</li>
+            </ul>
+        </li>
+    </ol>
+    
+    <h2>What was Fixed:</h2>
+    <ul>
+        <li>✅ Parser now correctly handles style objects in JSX (e.g., <code>style={{ backgroundColor: '#f8f9fa' }}</code>)</li>
+        <li>✅ ComponentRenderer now validates style props are objects, not strings</li>
+        <li>✅ Improved attribute parsing to handle nested braces in style objects</li>
+        <li>✅ Added fallback parsing for complex style expressions</li>
+    </ul>
+    
+    <h2>Error Fixed:</h2>
+    <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px;">
+TypeError: Failed to set an indexed property [0] on 'CSSStyleDeclaration': 
+Indexed property setter is not supported.
+    </pre>
+    
+    <p>This error occurred because the style prop was being treated as a string instead of an object, causing React to try to set it incorrectly on the DOM element.</p>
+    
+    <h2>Technical Details:</h2>
+    <p>The fix involved three key changes:</p>
+    <ol>
+        <li><strong>Parser Update (storyToBuilder.ts):</strong> Added special handling for style attributes to parse them as JavaScript objects</li>
+        <li><strong>ComponentRenderer Update:</strong> Added validation to ensure style props are objects before applying them</li>
+        <li><strong>Attribute Parsing:</strong> Improved the attribute parser to correctly handle nested braces in style declarations</li>
+    </ol>
+    
+    <script>
+        console.log('🧪 Visual Builder Style Fix Test Page Loaded');
+        console.log('📝 Navigate to Storybook and test the Visual Builder with the fixes applied');
+    </script>
+</body>
+</html>

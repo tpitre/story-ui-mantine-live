@@ -1,0 +1,81 @@
+{
+  "_source": "https://mantine.dev/styles/style-props/",
+
+  "scale": {
+    "xs": "0.625rem (10px)",
+    "sm": "0.75rem (12px)",
+    "md": "1rem (16px)",
+    "lg": "1.25rem (20px)",
+    "xl": "2rem (32px)"
+  },
+
+  "styleProps": {
+    "margin": {
+      "m": "margin (all sides)",
+      "mt": "margin-top",
+      "mb": "margin-bottom",
+      "ml": "margin-left",
+      "mr": "margin-right",
+      "ms": "margin-inline-start (RTL-aware)",
+      "me": "margin-inline-end (RTL-aware)",
+      "mx": "margin-left and margin-right",
+      "my": "margin-top and margin-bottom"
+    },
+    "padding": {
+      "p": "padding (all sides)",
+      "pt": "padding-top",
+      "pb": "padding-bottom",
+      "pl": "padding-left",
+      "pr": "padding-right",
+      "ps": "padding-inline-start (RTL-aware)",
+      "pe": "padding-inline-end (RTL-aware)",
+      "px": "padding-left and padding-right",
+      "py": "padding-top and padding-bottom"
+    },
+    "dimensions": {
+      "w": "width",
+      "miw": "min-width",
+      "maw": "max-width",
+      "h": "height",
+      "mih": "min-height",
+      "mah": "max-height"
+    }
+  },
+
+  "values": {
+    "themeTokens": ["xs", "sm", "md", "lg", "xl"],
+    "customValues": ["16", "5rem", "auto", "100%"]
+  },
+
+  "responsive": {
+    "description": "Object syntax enables breakpoint-based responsiveness",
+    "example": "p={{ base: 'sm', sm: 'md', lg: 'xl' }}",
+    "breakpoints": {
+      "base": "default (no breakpoint)",
+      "xs": "36em (576px)",
+      "sm": "48em (768px)",
+      "md": "62em (992px)",
+      "lg": "75em (1200px)",
+      "xl": "88em (1408px)"
+    }
+  },
+
+  "layoutComponents": {
+    "Stack": {
+      "description": "Vertical flex container",
+      "gapProp": "gap=\"md\"",
+      "example": "<Stack gap=\"md\">{children}</Stack>"
+    },
+    "Group": {
+      "description": "Horizontal flex container",
+      "gapProp": "gap=\"sm\"",
+      "example": "<Group gap=\"sm\">{children}</Group>"
+    },
+    "Flex": {
+      "description": "Advanced flex control",
+      "example": "<Flex gap=\"md\" justify=\"space-between\" align=\"center\">"
+    }
+  },
+
+  "note": "Stack and Group use flexbox gap. Older browsers may need flex-gap-polyfill PostCSS plugin."
+}

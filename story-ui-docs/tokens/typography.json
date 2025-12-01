@@ -1,0 +1,82 @@
+{
+  "_source": "https://mantine.dev/theming/typography/",
+
+  "fontFamilies": {
+    "default": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji",
+    "monospace": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
+    "themeProperties": {
+      "fontFamily": "Controls font for all components except Title, Code, and Kbd",
+      "fontFamilyMonospace": "For monospace-requiring components like Code, Kbd, and CodeHighlight",
+      "headings.fontFamily": "Specific to h1-h6 tags in Title and Typography components"
+    }
+  },
+
+  "fontSizes": {
+    "xs": { "value": "0.75rem", "pixels": "12px", "usage": "size=\"xs\"" },
+    "sm": { "value": "0.875rem", "pixels": "14px", "usage": "size=\"sm\"" },
+    "md": { "value": "1rem", "pixels": "16px", "usage": "size=\"md\" (default)" },
+    "lg": { "value": "1.125rem", "pixels": "18px", "usage": "size=\"lg\"" },
+    "xl": { "value": "1.25rem", "pixels": "20px", "usage": "size=\"xl\"" }
+  },
+
+  "lineHeights": {
+    "description": "Controls spacing between text lines, primarily for the Text component",
+    "xs": 1.4,
+    "sm": 1.45,
+    "md": 1.55,
+    "lg": 1.6,
+    "xl": 1.65
+  },
+
+  "fontWeights": {
+    "normal": { "value": 400, "usage": "fw={400}" },
+    "medium": { "value": 500, "usage": "fw={500}" },
+    "semibold": { "value": 600, "usage": "fw={600}" },
+    "bold": { "value": 700, "usage": "fw={700}" }
+  },
+
+  "textStyling": {
+    "italic": "fs=\"italic\"",
+    "underline": "td=\"underline\"",
+    "strikethrough": "td=\"line-through\"",
+    "uppercase": "tt=\"uppercase\"",
+    "capitalize": "tt=\"capitalize\""
+  },
+
+  "textComponents": {
+    "Text": {
+      "description": "Primary text component, polymorphic with <p> as default",
+      "usage": "<Text size=\"sm\" c=\"dimmed\">Description text</Text>"
+    },
+    "Title": {
+      "description": "Heading component for h1-h6 tags",
+      "usage": "<Title order={2}>Section Title</Title>",
+      "orders": {
+        "1": "34px (h1)",
+        "2": "26px (h2)",
+        "3": "22px (h3)",
+        "4": "18px (h4)",
+        "5": "16px (h5)",
+        "6": "14px (h6)"
+      }
+    },
+    "Anchor": {
+      "description": "Link text component",
+      "usage": "<Anchor href=\"#\">Click here</Anchor>"
+    },
+    "Code": {
+      "description": "Inline code component",
+      "usage": "<Code>npm install</Code>"
+    },
+    "Highlight": {
+      "description": "Highlighted text",
+      "usage": "<Highlight highlight=\"important\">This is important text</Highlight>"
+    }
+  },
+
+  "truncation": {
+    "singleLine": "truncate=\"end\"",
+    "multiLine": "lineClamp={2}",
+    "description": "lineClamp uses CSS -webkit-line-clamp"
+  }
+}

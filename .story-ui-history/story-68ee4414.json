@@ -1,0 +1,14 @@
+{
+  "storyId": "story-68ee4414",
+  "title": "Story 68ee4414",
+  "versions": [
+    {
+      "id": "f7578bfa6b60715c",
+      "timestamp": 1764450929879,
+      "prompt": "Create a pricing card",
+      "code": "import React from 'react';\nimport type { Meta, StoryObj } from '@storybook/react';\nimport { Card, Title, Text, Button, Stack, Badge, Group } from '@mantine/core';\n\nconst meta = {\n  title: 'Generated/Dashboard with Welcome Heading and Buttons',\n  parameters: {\n    layout: 'centered',\n  },\n} satisfies Meta;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Default: Story = {\n  render: () => (\n    <Card \n      shadow=\"sm\" \n      p=\"xl\" \n      radius=\"md\" \n      withBorder \n      style={{ \n        width: 350,\n        fontFamily: 'Comic Sans MS, cursive'\n      }}\n    >\n      <Stack gap=\"lg\">\n        <Group justify=\"space-between\" align=\"center\">\n          <Title order={3} tt=\"uppercase\">PROFESSIONAL PLAN</Title>\n          <Badge color=\"grape\" size=\"lg\">POPULAR</Badge>\n        </Group>\n        \n        <Stack gap=\"xs\">\n          <Group align=\"baseline\" gap=\"xs\">\n            <Text size=\"48px\" fw={700}>$49</Text>\n            <Text size=\"lg\" c=\"dimmed\">/month</Text>\n          </Group>\n          <Text size=\"sm\" c=\"dimmed\">\n            Perfect for growing teams and businesses\n          </Text>\n        </Stack>\n\n        <Stack gap=\"sm\">\n          <Text size=\"sm\">✓ Unlimited projects</Text>\n          <Text size=\"sm\">✓ Advanced analytics</Text>\n          <Text size=\"sm\">✓ Priority support</Text>\n          <Text size=\"sm\">✓ Custom integrations</Text>\n          <Text size=\"sm\">✓ Team collaboration</Text>\n        </Stack>\n\n        <Button \n          color=\"grape\" \n          size=\"lg\" \n          fullWidth \n          radius=\"md\"\n          mt=\"md\"\n        >\n          GET STARTED\n        </Button>\n\n        <Text size=\"xs\" c=\"dimmed\" ta=\"center\">\n          No credit card required • Cancel anytime\n        </Text>\n      </Stack>\n    </Card>\n  ),\n};",
+      "fileName": "story-68ee4414"
+    }
+  ],
+  "currentVersionId": "f7578bfa6b60715c"
+}

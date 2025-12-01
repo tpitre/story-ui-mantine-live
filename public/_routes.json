@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/story-ui-considerations.json",
+    "/index.json",
+    "/project.json",
+    "/*.svg",
+    "/*.woff2",
+    "/assets/*",
+    "/sb-addons/*",
+    "/sb-common-assets/*",
+    "/sb-manager/*"
+  ]
+}
