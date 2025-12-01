@@ -1,4 +1,12 @@
-{$PORT:80} {
+# Global options - disable auto HTTPS since Railway handles TLS termination
+{
+    auto_https off
+    # Disable admin API to prevent conflicts
+    admin off
+}
+
+# Listen on HTTP only - Railway handles TLS termination at its edge
+http://:{$PORT:80} {
     # Route /story-ui API requests to the Story UI MCP server
     # The StoryUIPanel makes requests to /story-ui/providers, /story-ui/generate, etc.
     handle /story-ui/* {
