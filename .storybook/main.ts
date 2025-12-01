@@ -90,14 +90,14 @@ const config: StorybookConfig = {
     };
 
     // Configure HMR for Railway/proxy environments
-    // When behind a reverse proxy (Caddy), Vite needs to know to connect through the proxy
+    // When behind a reverse proxy (Caddy), Vite needs to know clients connect through the proxy
     // not directly to the internal Storybook port (6006)
     if (process.env.RAILWAY_PUBLIC_DOMAIN) {
       config.server = {
         ...config.server,
         hmr: {
-          // Use the Railway public domain
-          host: process.env.RAILWAY_PUBLIC_DOMAIN,
+          // Don't set 'host' - that affects server binding, not client connection
+          // Use 'path' to ensure HMR requests go through the proxy
           // External port is always 443 for Railway HTTPS (TLS termination)
           clientPort: 443,
           // Use secure WebSocket since Railway uses HTTPS
