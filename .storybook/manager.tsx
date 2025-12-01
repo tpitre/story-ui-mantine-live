@@ -37,80 +37,101 @@ declare global {
  *
  * Into:
  *   <Button>Click</Button>
- *
- * @param fullStoryCode - The complete story file source code
- * @param variantName - Optional: The specific variant to extract (e.g., "Default", "Variations")
  */
 const extractUsageCode = (fullStoryCode: string, variantName?: string): string => {
-  // If a specific variant is requested, try to extract just that variant's code
+  // Helper function to generate JSX from args
+  const generateJsxFromArgs = (argsStr: string, componentName: string): string | null => {
+    try {
+      // Extract children if present
+      const childrenMatch = argsStr.match(/children:\s*['"`]([^'"`]+)['"`]/);
+      const children = childrenMatch ? childrenMatch[1] : '';
+
+      // Extract other props (simplified)
+      const propsStr = argsStr
+        .replace(/children:\s*['"`][^'"`]*['"`],?/, '') // Remove children
+        .replace(/^\{|\}$/g, '') // Remove braces
+        .trim();
+
+      if (children) {
+        if (propsStr) {
+          return `<${componentName} ${propsStr.replace(/,\s*$/, '')}>${children}</${componentName}>`;
+        }
+        return `<${componentName}>${children}</${componentName}>`;
+      } else if (propsStr) {
+        return `<${componentName} ${propsStr.replace(/,\s*$/, '')} />`;
+      }
+      return `<${componentName} />`;
+    } catch {
+      return null;
+    }
+  };
+
+  // Get the component name from meta
+  const componentMatch = fullStoryCode.match(/component:\s*([A-Z][A-Za-z0-9]*)/);
+  const componentName = componentMatch ? componentMatch[1] : null;
+
+  // If we have a variant name, try to find that specific variant's args or render
   if (variantName) {
-    // First, find the variant definition block
-    const variantBlockPattern = new RegExp(
-      `export\\s+const\\s+${variantName}[^=]*=\\s*\\{([\\s\\S]*?)\\};?\\s*(?:export|$)`,
+    // Normalize variant name for matching:
+    // - "primary" -> "Primary"
+    // - "full-width" -> "FullWidth" (kebab-case to PascalCase)
+    const normalizedVariant = variantName
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('');
+
+    // Pattern A: export const Primary: Story = { args: {...} }
+    // Match the specific variant's export block
+    const variantExportRegex = new RegExp(
+      `export\\s+const\\s+${normalizedVariant}\\s*(?::\\s*Story)?\\s*=\\s*\\{([\\s\\S]*?)\\}\\s*;`,
       'i'
     );
-    const variantBlockMatch = fullStoryCode.match(variantBlockPattern);
+    const variantExportMatch = fullStoryCode.match(variantExportRegex);
 
-    if (variantBlockMatch) {
-      const variantBlock = variantBlockMatch[1];
+    if (variantExportMatch) {
+      const variantBlock = variantExportMatch[1];
 
-      // Try to extract from render function with parentheses: render: () => (...)
-      const renderParensMatch = variantBlock.match(/render:\s*\([^)]*\)\s*=>\s*\(\s*([\s\S]*?)\s*\)\s*,?\s*$/);
-      if (renderParensMatch) {
-        return renderParensMatch[1].trim();
+      // Try to extract render function from this variant
+      const renderWithParensMatch = variantBlock.match(/render:\s*\([^)]*\)\s*=>\s*\(\s*([\s\S]*?)\s*\)\s*[,}]/);
+      if (renderWithParensMatch) {
+        return renderWithParensMatch[1].trim().replace(/,\s*$/, '');
       }
 
-      // Try to extract from render function without parentheses: render: () => <Component...>
-      const renderNoParensMatch = variantBlock.match(/render:\s*\([^)]*\)\s*=>\s*(<[A-Z][\s\S]*?(?:\/>|<\/[A-Za-z.]+>))\s*,?\s*$/);
+      const renderNoParensMatch = variantBlock.match(/render:\s*\([^)]*\)\s*=>\s*(<[A-Z][^,}]*(?:\/>|<\/[A-Za-z.]+>))/s);
       if (renderNoParensMatch) {
         return renderNoParensMatch[1].trim();
       }
-    }
 
-    // Pattern for args-based story: export const VariantName: Story = { args: {...} }
-    const variantArgsPattern = new RegExp(
-      `export\\s+const\\s+${variantName}[^=]*=\\s*\\{[^}]*args:\\s*(\\{[\\s\\S]*?\\})\\s*[,}]`,
-      'i'
-    );
-    const variantArgsMatch = fullStoryCode.match(variantArgsPattern);
-    if (variantArgsMatch) {
-      // Try to find the component from the meta
-      const componentMatch = fullStoryCode.match(/component:\s*([A-Z][A-Za-z0-9]*)/);
-      if (componentMatch) {
-        const componentName = componentMatch[1];
-        try {
-          const argsStr = variantArgsMatch[1];
-          // Extract children if present
-          const childrenMatch = argsStr.match(/children:\s*['"`]([^'"`]+)['"`]/);
-          const children = childrenMatch ? childrenMatch[1] : '';
-
-          // Extract leftSection if present (for badges/buttons with icons)
-          const leftSectionMatch = argsStr.match(/leftSection:\s*(<[^>]+\/>)/);
-          const leftSection = leftSectionMatch ? ` leftSection={${leftSectionMatch[1]}}` : '';
-
-          // Extract other common props
-          const colorMatch = argsStr.match(/color:\s*['"]([^'"]+)['"]/);
-          const variantMatch = argsStr.match(/variant:\s*['"]([^'"]+)['"]/);
-          const sizeMatch = argsStr.match(/size:\s*['"]([^'"]+)['"]/);
-
-          let propsStr = '';
-          if (colorMatch) propsStr += ` color="${colorMatch[1]}"`;
-          if (variantMatch) propsStr += ` variant="${variantMatch[1]}"`;
-          if (sizeMatch) propsStr += ` size="${sizeMatch[1]}"`;
-          propsStr += leftSection;
-
-          if (children) {
-            return `<${componentName}${propsStr}>${children}</${componentName}>`;
-          } else if (propsStr.trim()) {
-            return `<${componentName}${propsStr} />`;
-          }
-          return `<${componentName} />`;
-        } catch {
-          // Fall through to default extraction
-        }
+      // Try to extract args from this variant
+      const argsMatch = variantBlock.match(/args:\s*(\{[\s\S]*?\})\s*[,}]/);
+      if (argsMatch && componentName) {
+        const result = generateJsxFromArgs(argsMatch[1], componentName);
+        if (result) return result;
       }
     }
+
+    // Pattern B: Arrow function variant: export const Primary = () => <Component...>
+    const arrowVariantRegex = new RegExp(
+      `export\\s+const\\s+${normalizedVariant}\\s*=\\s*\\(\\)\\s*=>\\s*\\(\\s*([\\s\\S]*?)\\s*\\)\\s*;`,
+      'i'
+    );
+    const arrowVariantMatch = fullStoryCode.match(arrowVariantRegex);
+    if (arrowVariantMatch) {
+      return arrowVariantMatch[1].trim().replace(/,\s*$/, '');
+    }
+
+    // Pattern C: Arrow function without parens: export const Primary = () => <Component...>;
+    const arrowNoParensRegex = new RegExp(
+      `export\\s+const\\s+${normalizedVariant}\\s*=\\s*\\(\\)\\s*=>\\s*(<[A-Z][^;]*(?:\\/>|<\\/[A-Za-z.]+>))\\s*;`,
+      'is'
+    );
+    const arrowNoParensMatch = fullStoryCode.match(arrowNoParensRegex);
+    if (arrowNoParensMatch) {
+      return arrowNoParensMatch[1].trim();
+    }
   }
+
+  // Fallback: Try generic patterns (for Default or when variant not specified)
 
   // Try to extract JSX from render function: render: () => (<JSX>) or render: () => <JSX>
   // Pattern 1: render: () => (\n  <Component...>\n)
@@ -143,37 +164,9 @@ const extractUsageCode = (fullStoryCode: string, variantName?: string): string =
   // Pattern 5: Look for args-based stories with component prop spreading
   // e.g., args: { children: 'Click me', color: 'blue' }
   const argsMatch = fullStoryCode.match(/args:\s*(\{[\s\S]*?\})\s*[,}]/);
-  if (argsMatch) {
-    // Try to find the component from the meta
-    const componentMatch = fullStoryCode.match(/component:\s*([A-Z][A-Za-z0-9]*)/);
-    if (componentMatch) {
-      const componentName = componentMatch[1];
-      try {
-        // Parse the args to generate JSX
-        const argsStr = argsMatch[1];
-        // Extract children if present
-        const childrenMatch = argsStr.match(/children:\s*['"`]([^'"`]+)['"`]/);
-        const children = childrenMatch ? childrenMatch[1] : '';
-
-        // Extract other props (simplified)
-        const propsStr = argsStr
-          .replace(/children:\s*['"`][^'"`]*['"`],?/, '') // Remove children
-          .replace(/^\{|\}$/g, '') // Remove braces
-          .trim();
-
-        if (children) {
-          if (propsStr) {
-            return `<${componentName} ${propsStr.replace(/,\s*$/, '')}>${children}</${componentName}>`;
-          }
-          return `<${componentName}>${children}</${componentName}>`;
-        } else if (propsStr) {
-          return `<${componentName} ${propsStr.replace(/,\s*$/, '')} />`;
-        }
-        return `<${componentName} />`;
-      } catch {
-        // Fall through to return full code
-      }
-    }
+  if (argsMatch && componentName) {
+    const result = generateJsxFromArgs(argsMatch[1], componentName);
+    if (result) return result;
   }
 
   // Pattern 6: Look for any JSX block starting with < and ending with /> or </Component>
@@ -370,49 +363,33 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
   const [copied, setCopied] = useState(false);
   const [showFullCode, setShowFullCode] = useState(false);
 
-  // Get the current story ID first (needed by other useMemo hooks)
+  // Get the current story ID
   const currentStoryId = state?.storyId;
 
-  // Extract the variant name from the story ID (e.g., "generated-button--default" -> "Default")
-  const variantName = useMemo(() => {
-    if (!currentStoryId) return '';
-    const parts = currentStoryId.split('--');
-    if (parts.length >= 2) {
-      // Convert kebab-case to PascalCase: "my-variant" -> "MyVariant"
-      return parts[parts.length - 1]
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join('');
-    }
-    return 'Default';
+  // Extract variant name from story ID (e.g., "generated-button--primary" -> "primary", "generated-button--full-width" -> "full-width")
+  const currentVariant = useMemo(() => {
+    if (!currentStoryId) return undefined;
+    // Match everything after the last -- (variant can contain hyphens like "full-width")
+    const variantMatch = currentStoryId.match(/--([a-z0-9-]+)$/i);
+    return variantMatch ? variantMatch[1] : undefined;
   }, [currentStoryId]);
 
-  // Extract the file name from the story ID (e.g., "generated-purple-badge--default" -> "purple-badge")
-  const storyFileName = useMemo(() => {
-    if (!currentStoryId) return '';
-    // Remove "generated-" prefix and "--variant" suffix
-    let name = currentStoryId.replace(/^generated-/, '');
-    const variantIndex = name.lastIndexOf('--');
-    if (variantIndex > 0) {
-      name = name.substring(0, variantIndex);
-    }
-    return name;
-  }, [currentStoryId]);
-
-  // Memoize the extracted usage code (for toggle button visibility check)
-  const extractedUsageCode = useMemo(() => {
+  // Memoize the usage code extraction with variant awareness
+  const usageCode = useMemo(() => {
     if (!sourceCode) return '';
-    return extractUsageCode(sourceCode, variantName);
-  }, [sourceCode, variantName]);
+    return extractUsageCode(sourceCode, currentVariant);
+  }, [sourceCode, currentVariant]);
 
-  // Check if usage code extraction is different from full source (determines toggle visibility)
-  const hasUsageCode = sourceCode !== '' && extractedUsageCode !== sourceCode;
-
-  // Memoize the display code (what actually shows in the panel)
   const displayCode = useMemo(() => {
     if (!sourceCode) return '';
-    return showFullCode ? sourceCode : extractedUsageCode;
-  }, [sourceCode, showFullCode, extractedUsageCode]);
+    return showFullCode ? sourceCode : usageCode;
+  }, [sourceCode, showFullCode, usageCode]);
+
+  // Check if there's different usage code (for showing toggle button)
+  // This should remain true even when showing full code
+  const hasUsageCode = useMemo(() => {
+    return sourceCode && usageCode && usageCode !== sourceCode;
+  }, [sourceCode, usageCode]);
 
   // Try to get source code from the story
   useEffect(() => {
@@ -441,73 +418,114 @@ const SourceCodePanel: React.FC<{ active?: boolean }> = ({ active }) => {
       setStoryTitle(currentStoryId);
     }
 
-    // For generated stories, fetch source code from the Vite plugin API
-    if (isGeneratedStory && storyFileName) {
-      // First try the Vite plugin API to get fresh source code
-      const fetchSourceCode = async () => {
+    // For generated stories (whether or not they exist in Storybook), try to get from cache/localStorage
+    if (isGeneratedStory) {
+      // Try to get from window cache first
+      const topWindow = window.top || window;
+      let cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[currentStoryId] ||
+                        window.__STORY_UI_GENERATED_CODE__?.[currentStoryId];
+
+      console.log('[Source Code Panel DEBUG] Looking for code:', {
+        currentStoryId,
+        foundInWindowCache: !!cachedCode,
+        windowCacheKeys: Object.keys(topWindow.__STORY_UI_GENERATED_CODE__ || {}),
+      });
+
+      // If not in memory cache, check localStorage (survives page navigation)
+      if (!cachedCode) {
         try {
-          // Try fetching from the Vite raw source plugin
-          const response = await fetch(`/api/raw-source?file=${encodeURIComponent(storyFileName)}&isEdited=false`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.source) {
-              console.log('[Story UI] Loaded source from API for:', storyFileName);
-              setSourceCode(data.source);
-              return;
+          const stored = JSON.parse(localStorage.getItem('storyui_generated_code') || '{}');
+
+          console.log('[Source Code Panel DEBUG] localStorage lookup:', {
+            localStorageKeys: Object.keys(stored),
+            localStorageKeyCount: Object.keys(stored).length,
+          });
+
+          // Try multiple key formats since Storybook IDs differ from our storage keys
+          // Storybook ID format: "generated-componentname--variant" or "generated/componentname--variant"
+          // Our storage keys: "ComponentName", "ComponentName.stories.tsx", "story-hash123", etc.
+          const keysToTry: string[] = [currentStoryId];
+
+          // Extract component name and base story ID from Storybook ID
+          // e.g., "generated-simple-test-button--primary" -> baseId: "generated-simple-test-button--default", component: "simpletestbutton"
+          const match = currentStoryId.match(/^(generated[-\/]?.+?)(?:--(.*))?$/i);
+          if (match) {
+            const baseId = match[1];
+            const variant = match[2];
+
+            // Try base story ID with --default variant (this is what we store)
+            if (variant && variant !== 'default') {
+              keysToTry.push(`${baseId}--default`);
             }
+            // Also try just the base ID without any variant
+            keysToTry.push(baseId);
+
+            // Extract component name (e.g., "generated-simple-test-button" -> "simpletestbutton")
+            const componentMatch = baseId.match(/^generated[-\/]?(.+)$/i);
+            if (componentMatch) {
+              const componentNameLower = componentMatch[1].replace(/-/g, '');
+              keysToTry.push(componentNameLower);
+              // Try PascalCase version (e.g., "simpletestbutton" -> "Simpletestbutton")
+              const pascalCase = componentNameLower.charAt(0).toUpperCase() + componentNameLower.slice(1);
+              keysToTry.push(pascalCase);
+              keysToTry.push(`${pascalCase}.stories.tsx`);
+
+              // Try with spaces converted to title case (e.g., "Simple Test Button" -> "SimpleTestButton")
+              const words = componentMatch[1].split('-');
+              if (words.length > 1) {
+                const titleCase = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+                keysToTry.push(titleCase);
+                // Also try with space-separated title (what we store)
+                const spacedTitle = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                keysToTry.push(spacedTitle);
+              }
+            }
+          }
+
+          // Also try the story title if available
+          if (storyTitle) {
+            keysToTry.push(storyTitle);
+            keysToTry.push(storyTitle.replace(/\s+/g, ''));
+            keysToTry.push(`${storyTitle.replace(/\s+/g, '')}.stories.tsx`);
+          }
+
+          console.log('[Source Code Panel DEBUG] trying keys:', keysToTry);
+
+          // Try each key format
+          for (const key of keysToTry) {
+            if (stored[key]) {
+              cachedCode = stored[key];
+              console.log('[Source Code Panel DEBUG] found code with key:', key, 'codeLength:', cachedCode?.length);
+              break;
+            }
+          }
+
+          // Restore to memory cache if found
+          if (cachedCode) {
+            if (!topWindow.__STORY_UI_GENERATED_CODE__) {
+              topWindow.__STORY_UI_GENERATED_CODE__ = {};
+            }
+            topWindow.__STORY_UI_GENERATED_CODE__[currentStoryId] = cachedCode;
           }
         } catch (e) {
-          console.log('[Story UI] API fetch failed, falling back to cache:', e);
+          console.warn('[Story UI] Failed to read from localStorage:', e);
         }
+      }
 
-        // Fallback to localStorage/memory cache
-        const topWindow = window.top || window;
+      console.log('[Source Code Panel DEBUG] final result:', {
+        foundCode: !!cachedCode,
+        codeLength: cachedCode?.length,
+      });
 
-        // Try exact match first
-        let cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[currentStoryId] ||
-                          window.__STORY_UI_GENERATED_CODE__?.[currentStoryId];
-
-        // If not found, try to find any story from the same file (e.g., try --default if viewing --variations)
-        if (!cachedCode) {
-          const baseStoryId = `generated-${storyFileName}--default`;
-          cachedCode = topWindow.__STORY_UI_GENERATED_CODE__?.[baseStoryId] ||
-                        window.__STORY_UI_GENERATED_CODE__?.[baseStoryId];
-        }
-
-        // If not in memory cache, check localStorage (survives page navigation)
-        if (!cachedCode) {
-          try {
-            const stored = JSON.parse(localStorage.getItem('storyui_generated_code') || '{}');
-            cachedCode = stored[currentStoryId];
-            // Also try the base story ID
-            if (!cachedCode) {
-              const baseStoryId = `generated-${storyFileName}--default`;
-              cachedCode = stored[baseStoryId];
-            }
-            // Restore to memory cache if found
-            if (cachedCode) {
-              if (!topWindow.__STORY_UI_GENERATED_CODE__) {
-                topWindow.__STORY_UI_GENERATED_CODE__ = {};
-              }
-              topWindow.__STORY_UI_GENERATED_CODE__[currentStoryId] = cachedCode;
-            }
-          } catch (e) {
-            console.warn('[Story UI] Failed to read from localStorage:', e);
-          }
-        }
-
-        if (cachedCode) {
-          setSourceCode(cachedCode);
-        } else {
-          setSourceCode('');
-        }
-      };
-
-      fetchSourceCode();
+      if (cachedCode) {
+        setSourceCode(cachedCode);
+      } else {
+        setSourceCode('');
+      }
     } else {
       setSourceCode('');
     }
-  }, [currentStoryId, active, api, storyFileName]);
+  }, [currentStoryId, active, api]);
 
   // Listen for code generated events from StoryUIPanel
   useEffect(() => {
