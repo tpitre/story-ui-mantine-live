@@ -1,5 +1,6 @@
 # Story UI Live Deployment
 # Runs Storybook in dev mode with Story UI MCP server behind Caddy reverse proxy
+# Build timestamp: 2025-12-01T02:10:00Z - force fresh build
 
 FROM node:20-slim
 
