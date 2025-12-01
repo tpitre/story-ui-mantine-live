@@ -10,10 +10,8 @@
         reverse_proxy 127.0.0.1:4005
     }
 
-    # Serve static Storybook files
+    # Everything else goes to Storybook dev server
     handle {
-        root * /app/storybook-static
-        try_files {path} {path}/ /index.html
-        file_server
+        reverse_proxy 127.0.0.1:6006
     }
 }

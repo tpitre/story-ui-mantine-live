@@ -1,29 +1,48 @@
 #!/bin/bash
 
 # Story UI Live Production Start Script
-# Uses static Storybook build + MCP server behind Caddy reverse proxy
+# Runs Storybook dev mode + MCP server behind Caddy reverse proxy
+# Dev mode is REQUIRED for Story UI's hot reload story generation
 
 echo "Starting Story UI Live Environment..."
 
-# Build Storybook static files (faster and more reliable than dev mode)
-echo "Building Storybook static files..."
-npm run build-storybook
+# Function to wait for port to be open
+wait_for_port() {
+    local port=$1
+    local name=$2
+    local max_attempts=120
+    local attempt=1
 
-# Check if build succeeded
-if [ ! -d "storybook-static" ]; then
-    echo "ERROR: Storybook build failed - no storybook-static directory"
-    exit 1
-fi
+    echo "Waiting for $name on port $port..."
+    while ! nc -z 127.0.0.1 $port 2>/dev/null; do
+        if [ $attempt -ge $max_attempts ]; then
+            echo "ERROR: $name failed to start on port $port after $max_attempts attempts"
+            exit 1
+        fi
+        echo "  Attempt $attempt/$max_attempts - waiting..."
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    echo "$name is listening on port $port"
+}
 
-echo "Storybook build complete!"
+# Start Storybook dev server in background
+echo "Starting Storybook dev server on port 6006..."
+npm run storybook -- --port 6006 --host 0.0.0.0 --ci --no-open &
+STORYBOOK_PID=$!
 
 # Start Story UI MCP server in background
 echo "Starting Story UI MCP server on port 4005..."
 npx story-ui start --port 4005 &
 MCP_PID=$!
 
-# Brief wait for MCP server to start
-sleep 3
+# Wait for both services to bind their ports
+wait_for_port 6006 "Storybook"
+wait_for_port 4005 "Story UI MCP Server"
+
+# Give Storybook a moment to fully initialize after port is bound
+echo "Allowing Storybook to fully initialize..."
+sleep 10
 
 # Start Caddy reverse proxy (foreground)
 echo ""

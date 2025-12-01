@@ -1,6 +1,6 @@
 # Story UI Live Deployment
-# Uses static Storybook build with Story UI MCP server behind Caddy reverse proxy
-# Build timestamp: 2025-12-01T04:10:00Z - switch to static build for reliability
+# Runs Storybook DEV MODE (required for hot reload story generation) with MCP server behind Caddy
+# Build timestamp: 2025-12-01T04:20:00Z - fix: simpler port-only health check, dev mode
 
 FROM node:20-slim
 
