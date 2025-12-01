@@ -28,4 +28,4 @@ storybook-static
 
 .env
 src/stories/generated
-src/stories/StoryUI/
+# Note: src/stories/StoryUI/ is NOT ignored - it must be committed for production deployment

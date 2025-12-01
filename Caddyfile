@@ -1,5 +1,11 @@
 :80 {
-    # Route /mcp requests to the Story UI MCP server
+    # Route /story-ui API requests to the Story UI MCP server
+    # The StoryUIPanel makes requests to /story-ui/providers, /story-ui/generate, etc.
+    handle /story-ui/* {
+        reverse_proxy 127.0.0.1:4005
+    }
+
+    # Also route /mcp requests to the Story UI MCP server (legacy support)
     handle /mcp* {
         reverse_proxy 127.0.0.1:4005
     }
