@@ -3,9 +3,10 @@
 
 FROM node:20-slim
 
-# Install Caddy
+# Install Caddy and netcat (for port checking)
 RUN apt-get update && apt-get install -y \
     curl \
+    netcat-openbsd \
     debian-keyring \
     debian-archive-keyring \
     apt-transport-https \
