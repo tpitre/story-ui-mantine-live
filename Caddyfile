@@ -1,4 +1,4 @@
-:80 {
+{$PORT:80} {
     # Route /story-ui API requests to the Story UI MCP server
     # The StoryUIPanel makes requests to /story-ui/providers, /story-ui/generate, etc.
     handle /story-ui/* {
